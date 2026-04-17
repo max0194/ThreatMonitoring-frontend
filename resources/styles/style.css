@@ -1,0 +1,228 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #202020; 
+    color: #ffffff; 
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #202020;
+    padding: 1rem 2rem;
+    border-bottom: 2px solid #ffffff;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header h1 {
+    color: #ffffff;
+    font-size: 1.5rem;
+}
+
+.user-type {
+    background-color: #ffffff;
+    color:#000000;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #000000;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #000000;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    background-color: #202020;
+    color: #ffffff;
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #ffffff;
+}
+
+button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #202020;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #ffffff;
+    color: #202020
+}
+
+.error {
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.employee-main {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.form-container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-container h2 {
+    margin-bottom: 1.5rem;
+    color: #000000;
+    text-align: center;
+}
+
+.specialist-main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.specialist-main h2 {
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+    text-align: center;
+}
+
+.requests-container {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.request-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.request-card:hover {
+    transform: translateY(-2px);
+}
+
+.request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: #000000;
+}
+
+.request-header h3 {
+    color: #000000;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.status-новая {
+    background-color: #f8cb82;
+    color: #000000;
+}
+
+.status-в-работе {
+    background-color: #96bed8;
+    color: #000000;
+}
+
+.status-решена {
+    background-color: #87eab0;
+    color: #000000;
+}
+
+.request-info p {
+    margin-bottom: 0.5rem;
+    color: #000000;
+}
+
+.request-info strong {
+    color: #000000;
+}
+
+.request-description {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 5px;
+    color: #000000;
+}
+
+.view-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #202020;
+    color: #ffffff;
+    border-color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.view-button:hover {
+    background-color: #ffffff;
+    color: #000000;
+    text-decoration: none;
+}
+.field {
+    color:#000000
+}

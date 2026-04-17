@@ -1,0 +1,74 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <meta charset="UTF-8">  
+    <title>Заявка #{{ .request.ID }}</title>  
+    <style>  
+        body { font-family: Arial, sans-serif; margin: 20px; }  
+        .field { margin: 10px 0; }  
+        label { font-weight: bold; }  
+        img { max-width: 100%; border: 1px solid #ccc; margin-top: 10px; }  
+    </style>
+    <link rel="stylesheet" href="/static/styles/style.css?v=20260225210415">  
+</head>
+
+<body> 
+   <header>
+        <div class="header-content">
+            <h1>Система мониторинга IT-угроз</h1>
+            <span class="user-type">Специалист</span>
+        </div>
+    </header>
+    <main class="specialist-main">
+        <h2>Заявка #{{ .request.ID }}</h1>  
+        <div class="request-card">
+            <div class="field">  
+                <label>Описание:</label>  
+                <p>{{ .request.Description }}</p>  
+            </div>  
+
+            <div class="field">
+                    <label>Статус:</label>
+                    <p>{{ .request.Status }}</p>
+                </div>
+
+                <div class="field">
+                    <label>Дата создания:</label>
+                    <p>{{ .request.CreatedAt }}</p>
+                </div>
+
+                <div class="field">
+                    <label>Сотрудник:</label>
+                    <p>{{ .worker.FullName }} ({{ .worker.Email }})</p>
+                </div>
+
+                <div class="field">
+                    <label>Тип угрозы:</label>
+                    <p>{{ .threatType.Name }} (Категория: {{ .category.Name }})</p>
+                </div>
+
+                <div class="field">
+                    <label>Факты:</label>
+                    {{ if .facts }}
+                        {{ range .facts }}
+                            <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px; background-color: #f9f9f9;">
+                                <h3 style="margin-top: 0;">{{ .Title }}</h3>
+                                <p><strong>Описание:</strong> {{ .Description }}</p>
+                                <p><strong>Дата:</strong> {{ .CreatedAt }}</p>
+                                {{ if .ScreenshotURL }}
+                                    <img src="{{ .ScreenshotURL }}" alt="Скриншот" style="max-width: 400px; border: 1px solid #ccc; margin-top: 10px;">
+                                {{ else }}
+                                    <p><em>Скриншот не загружен.</em></p>
+                                {{ end }}
+                            </div>
+                        {{ end }}
+                    {{ else }}
+                        <p>Факты не найдены.</p>
+                    {{ end }}
+                </div>
+            </div>
+        <br><br>
+        <a href="/specialist">← Назад к списку</a>
+    </main>
+</body>
+</html>

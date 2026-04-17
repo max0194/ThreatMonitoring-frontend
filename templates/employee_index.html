@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мониторинг IT-угроз - Сотрудник</title>
+    <link rel="stylesheet" href="/static/styles/style.css?v=20260225210416">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Система мониторинга IT-угроз</h1>
+            <span class="user-type">Сотрудник</span>
+        </div>
+    </header>
+    
+    <main class="employee-main">
+        <div class="form-container">
+            <h2>Создать новую заявку</h2>
+            <form method="POST" action="/create-request">
+                <div class="form-group">
+                    <label for="category">Категория угрозы:</label>
+                    <select name="category" id="category" required>
+                        <option value="">Выберите категорию</option>
+                        {{ range .categories }}
+                        <option value="{{ .ID }}">{{ .Name }} (приоритет: {{ .Priority }})</option>
+                        {{ end }}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="threat_type">Тип угрозы:</label>
+                    <select name="threat_type" id="threat_type" required>
+                        <option value="">Выберите тип угрозы</option>
+                        {{ range .threatTypes }}
+                        <option value="{{ .ID }}" data-category="{{ .CategoryID }}">{{ .Name }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Описание угрозы:</label>
+                    <textarea name="description" id="description" rows="5" required placeholder="Опишите обнаруженную IT-угрозу..."></textarea>
+                </div>
+                
+                <button type="submit">Отправить заявку</button>
+            </form>
+        </div>
+        </div>
+    </main>
+    
+    <script>
+        document.getElementById('category').addEventListener('change', function() {
+            const selectedCategory = this.value;
+            const threatTypeSelect = document.getElementById('threat_type');
+            const options = threatTypeSelect.querySelectorAll('option');
+            
+            options.forEach(option => {
+                if (option.value === '') {
+                    option.style.display = 'block';
+                } else {
+                    const category = option.getAttribute('data-category');
+                    if (selectedCategory === '' || category === selectedCategory) {
+                        option.style.display = 'block';
+                    } else {
+                        option.style.display = 'none';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
