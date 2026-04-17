@@ -10,34 +10,61 @@
     <header>
         <div class="header-content">
             <h1>Система мониторинга IT-угроз</h1>
-            <span class="user-type">Специалист</span>
+            <div class="user-info">
+                <span class="user-type">Специалист по безопасности</span>
+                <span class="user-name">{{ .userName }}</span>
+                <a href="/logout" class="logout-btn">Выход</a>
+            </div>
         </div>
     </header>
     
     <main class="specialist-main">
-        <h2>Все заявки</h2>
-        <div class="requests-container">
-            {{ range .requests }}
-            <div class="request-card status-{{ .Status }}">
-                <div class="request-header">
-                    <h3>Заявка #{{ .ID }}</h3>
-                    <span class="status-badge">{{ .Status }}</span>
-                </div>
-                <div class="request-info">
-                    {{ $worker := index $.workerMap .WorkerID }}
-                    <p><strong>Сотрудник:</strong> {{ $worker.FullName }}</p>
-                    <p><strong>Отдел:</strong> {{ $worker.Department }}</p>
-                    <p><strong>Почта:</strong> {{ $worker.Email }}</p>
-                    <p><strong>Дата:</strong> {{ .CreatedAt }}</p>
-                </div>
+        <h2>Все заявки по IT-угрозам</h2>
+        
+        {{ if .requests }}
+            <div class="requests-container">
+                <form method="GET" action="/specialist" class="request-search" style="margin-bottom:12px;">
+                    <input type="text" id="searchInput" name="q" placeholder="Поиск по заявкам..." value="{{ .query }}" style="padding:6px 8px; border-radius:4px; border:1px solid #ccc;">
+                    <button type="submit">🔍 Поиск</button>
+                </form>
+                {{ range .requests }}
+                    <div class="request-card status-{{ .Status }}">
+                        <div class="request-header">
+                            <div>
+                                <h3>#{{ .ID }} - Заявка</h3>
+                                {{ if eq .Status "draft" }}
+                                    <span class="status-badge status-{{ .Status }}">Черновик</span>
+                                {{ else if eq .Status "awaiting" }}
+                                    <span class="status-badge status-{{ .Status }}">Ожидает</span>
+                                {{ else if eq .Status "taken" }}
+                                    <span class="status-badge status-{{ .Status }}">Принята</span>
+                                {{ else if eq .Status "closed" }}
+                                    <span class="status-badge status-{{ .Status }}">Закрыта</span>
+                                {{ end }}
+                            </div>
+                        </div>
+                        
+                        <div class="request-info">
+                            {{ $worker := index $.workerMap .CreatorID }}
+                            <p><strong>Сотрудник:</strong> {{ $worker.FullName }}</p>
+                            <p><strong>Почта:</strong> <a href="mailto:{{ $worker.Email }}" style="color: #3498db;">{{ $worker.Email }}</a></p>
+                            <p><strong>Дата:</strong> {{ .CreatedAt }}</p>
+                        </div>
 
-                <div class="request-description">
-                    <p>{{ .Description }}</p>
-                </div>
-                <a href="/request/{{ .ID }}" class="view-button">Просмотреть заявку</a>
+                        <div class="request-description">
+                            <strong>Описание угрозы:</strong><br>
+                            {{ .Description }}
+                        </div>
+                        
+                        <a href="/request/{{ .ID }}" class="view-button">Просмотреть полную заявку →</a>
+                    </div>
+                {{ end }}
             </div>
-            {{ end }}
-        </div>
+        {{ else }}
+            <div class="no-facts" style="margin-top: 2rem;">
+                <p>В настоящий момент нет заявок по IT-угрозам.</p>
+            </div>
+        {{ end }}
     </main>
 </body>
 </html>

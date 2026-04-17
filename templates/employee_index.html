@@ -10,48 +10,55 @@
     <header>
         <div class="header-content">
             <h1>Система мониторинга IT-угроз</h1>
-            <span class="user-type">Сотрудник</span>
+            <div class="user-info">
+                <a href="/employee/requests" class="nav-btn-small">Все заявки</a>
+                <span class="user-type">Сотрудник</span>
+                <span class="user-name">{{ .userName }}</span>
+                <a href="/logout" class="logout-btn">Выход</a>
+            </div>
         </div>
     </header>
     
     <main class="employee-main">
         <div class="form-container">
-            <h2>Создать новую заявку</h2>
-            <form method="POST" action="/create-request">
+            <h2>Создать новую заявку об угрозе</h2>
+            <form method="POST" action="/create-request" accept-charset="UTF-8">
                 <div class="form-group">
                     <label for="category">Категория угрозы:</label>
-                    <select name="category" id="category" required>
-                        <option value="">Выберите категорию</option>
+                    <select name="category" id="category" required onchange="filterThreatTypes()">
+                        <option value="">-- Выберите категорию --</option>
                         {{ range .categories }}
                         <option value="{{ .ID }}">{{ .Name }} (приоритет: {{ .Priority }})</option>
                         {{ end }}
                     </select>
+                    <small>Выберите категорию, к которой относится обнаруженная угроза</small>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="threat_type">Тип угрозы:</label>
                     <select name="threat_type" id="threat_type" required>
-                        <option value="">Выберите тип угрозы</option>
+                        <option value="">-- Выберите тип угрозы --</option>
                         {{ range .threatTypes }}
-                        <option value="{{ .ID }}" data-category="{{ .CategoryID }}">{{ .Name }}</option>
+                        <option value="{{ .ID }}" data-category="{{ .CategoryID }}" style="display: none;">{{ .Name }}</option>
                         {{ end }}
                     </select>
+                    <small>Тип угрозы будет отфильтрован в зависимости от выбранной категории</small>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="description">Описание угрозы:</label>
-                    <textarea name="description" id="description" rows="5" required placeholder="Опишите обнаруженную IT-угрозу..."></textarea>
+                    <textarea name="description" id="description" rows="6" required placeholder="Подробно опишите обнаруженную IT-угрозу:&#10;- Что было замечено&#10;- Когда это произошло&#10;- Какой ущерб возможен"></textarea>
+                    <small>Предоставьте как можно больше деталей для лучшей оценки угрозы</small>
                 </div>
-                
-                <button type="submit">Отправить заявку</button>
+
+                <button class="wide-button" type="submit">✓ Отправить заявку</button>
             </form>
-        </div>
         </div>
     </main>
     
     <script>
-        document.getElementById('category').addEventListener('change', function() {
-            const selectedCategory = this.value;
+        function filterThreatTypes() {
+            const selectedCategory = document.getElementById('category').value;
             const threatTypeSelect = document.getElementById('threat_type');
             const options = threatTypeSelect.querySelectorAll('option');
             
@@ -67,6 +74,12 @@
                     }
                 }
             });
+            
+            threatTypeSelect.value = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            filterThreatTypes();
         });
     </script>
 </body>

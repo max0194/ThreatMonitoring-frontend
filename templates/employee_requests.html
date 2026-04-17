@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои заявки - Сотрудник</title>
+    <link rel="stylesheet" href="/static/styles/style.css?v=20260225210415">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Мои заявки</h1>
+            <div class="user-info">
+                <span class="user-type">Сотрудник</span>
+                <span class="user-name">{{ .userName }}</span>
+                <a href="/logout" class="logout-btn">Выход</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="employee-main">
+        <div class="navigation">
+            <a href="/employee" class="nav-btn">← Назад к созданию заявки</a>
+        </div>
+
+        <div class="requests-container">
+            <h2>Все ваши заявки</h2>
+            {{ if .requests }}
+                <div class="requests-list">
+                    <form method="GET" action="/employee/requests" class="request-search" style="margin-bottom:12px;">
+                        <input type="text" id="searchInput" name="q" placeholder="Поиск по заявкам..." value="{{ .query }}" style="padding:6px 8px; border-radius:4px; border:1px solid #ccc;">
+                        <button type="submit">🔍 Поиск</button>
+                    </form>
+                    {{ range .requests }}
+                        <div class="request-item">
+                            <div class="request-item-header">
+                                <h3>#{{ .ID }} - {{ .Title }}</h3>
+                                <span class="status-badge status-{{ .Status }}">{{ .Status }}</span>
+                            </div>
+                            <div class="request-info">
+                                <p><strong>Тип угрозы:</strong> {{ if .ThreatType }}{{ .ThreatType.Name }}{{ else }}Не указан{{ end }}</p>
+                                <p><strong>Дата создания:</strong> {{ .CreatedAt.Format "02.01.2006 15:04" }}</p>
+                                <p><strong>Описание:</strong> {{ .Description }}</p>
+                            </div>
+                            <div class="request-actions">
+                                <a href="/request/{{ .ID }}" class="view-button">👁 Просмотреть детали</a>
+                            </div>
+                        </div>
+                    {{ end }}
+                </div>
+            {{ else }}
+                <div class="no-requests">
+                    <p>У вас пока нет заявок.</p>
+                    <a href="/employee" class="nav-btn">Создать первую заявку</a>
+                </div>
+            {{ end }}
+        </div>
+    </main>
+</body>
+</html>

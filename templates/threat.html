@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тип угрозы</title>
+    <link rel="stylesheet" href="/static/styles/style.css?v=20260225210415">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Система мониторинга IT-угроз</h1>
+            <span class="user-type">Информация об угрозе</span>
+        </div>
+    </header>
+    
+    <div class="request-detail">
+        <a href="/specialist" class="back-button">← Назад к списку</a>
+        
+        <div class="request-detail-header">
+            <h1>{{ .threatType.Name }}</h1>
+            <p style="color: #95a5a6;">Тип угрозы</p>
+        </div>
+
+        <div class="request-detail-header">
+            <div class="detail-field">
+                <label>Категория:</label>
+                <p>{{ .category.Name }}</p>
+            </div>
+            
+            <div class="detail-field">
+                <label>Приоритет:</label>
+                <p>
+                    {{ if eq .category.Priority 1 }}
+                        <span style="color: #e74c3c;">Критический</span>
+                    {{ else if eq .category.Priority 2 }}
+                        <span style="color: #f39c12;">Высокий</span>
+                    {{ else }}
+                        <span style="color: #3498db;">Средний</span>
+                    {{ end }}
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

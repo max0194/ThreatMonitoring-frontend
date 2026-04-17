@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка</title>
+    <link rel="stylesheet" href="/static/styles/style.css?v=20260225210415">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Система мониторинга IT-угроз</h1>
+        </div>
+    </header>
+    
+    <main class="employee-main">
+        <div class="form-container">
+            <h2>Ошибка</h2>
+            <div class="error" style="margin-bottom: 2rem;">
+                {{ .error }}
+            </div>
+            <a href="/login" class="back-button">← Вернуться на главную</a>
+        </div>
+    </main>
+</body>
+</html>

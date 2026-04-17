@@ -1,74 +1,138 @@
 <!DOCTYPE html>  
-<html>  
+<html lang="ru">  
 <head>  
-    <meta charset="UTF-8">  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <title>Заявка #{{ .request.ID }}</title>  
-    <style>  
-        body { font-family: Arial, sans-serif; margin: 20px; }  
-        .field { margin: 10px 0; }  
-        label { font-weight: bold; }  
-        img { max-width: 100%; border: 1px solid #ccc; margin-top: 10px; }  
-    </style>
-    <link rel="stylesheet" href="/static/styles/style.css?v=20260225210415">  
-</head>
-
-<body> 
-   <header>
+    <link rel="stylesheet" href="/static/styles/style.css?v=20260225210415">
+</head>  
+<body>
+    <header>
         <div class="header-content">
             <h1>Система мониторинга IT-угроз</h1>
-            <span class="user-type">Специалист</span>
+            <div class="user-info">
+                <span class="user-type">{{ if eq .userType "employee" }}Сотрудник{{ else }}Специалист{{ end }}</span>
+                <span class="user-name">{{ .userName }}</span>
+                <a href="/logout" class="logout-btn">Выход</a>
+            </div>
         </div>
     </header>
-    <main class="specialist-main">
-        <h2>Заявка #{{ .request.ID }}</h1>  
-        <div class="request-card">
-            <div class="field">  
-                <label>Описание:</label>  
-                <p>{{ .request.Description }}</p>  
-            </div>  
+    
+    <div class="request-detail">
+        <a href="{{ if eq .userType "employee" }}/employee/requests{{ else }}/specialist{{ end }}" class="back-button">← Назад к списку</a>
+        
+        <div class="request-detail-header">
+            <h1>Заявка #{{ .request.ID }}</h1>
+            {{ if eq .userType "specialist" }}
+                {{ if eq .request.Status "awaiting" }}
+                    <span class="status-badge status-{{ .request.Status }}">Ожидает</span>
+                    <form method="POST" action="/request/{{ .request.ID }}/update-status" style="display: inline;">
+                        <input type="hidden" name="status" value="taken">
+                        <button type="submit" class="status-btn status-btn-take">Принять заявку</button>
+                    </form>
+                {{ else if eq .request.Status "taken" }}
+                    <span class="status-badge status-{{ .request.Status }}">Принята</span>
+                    <form method="POST" class="request-status-button" action="/request/{{ .request.ID }}/update-status" style="display: inline;">
+                        <input type="hidden" name="status" value="closed">
+                        <button type="submit" class="status-btn status-btn-close">Закрыть заявку</button>
+                    </form>
+                {{ else if eq .request.Status "closed" }}
+                    <span class="status-badge status-{{ .request.Status }}">Закрыта</span>
+                {{ end }}
+            {{ else if eq .userType "employee" }}
+                {{ if ne .request.Status "closed" }}
+                    <span class="status-badge status-{{ .request.Status }}">{{ .request.Status }}</span>
+                    <form method="POST" action="/request/{{ .request.ID }}/update-status" style="display: inline;">
+                        <input type="hidden" name="status" value="closed">
+                        <button type="submit" class="status-btn status-btn-close">Закрыть заявку</button>
+                    </form>
+                {{ end }}
+                    <form method="POST" action="/request/{{ .request.ID }}/delete" style="display: inline;">
+                        <input type="hidden" name="status" value="deleted">
+                        <button type="submit" class="status-btn status-btn-close">Удалить заявку</button>
+                    </form>
+            {{ end }}
+        </div>
 
-            <div class="field">
-                    <label>Статус:</label>
-                    <p>{{ .request.Status }}</p>
-                </div>
-
-                <div class="field">
-                    <label>Дата создания:</label>
-                    <p>{{ .request.CreatedAt }}</p>
-                </div>
-
-                <div class="field">
-                    <label>Сотрудник:</label>
-                    <p>{{ .worker.FullName }} ({{ .worker.Email }})</p>
-                </div>
-
-                <div class="field">
-                    <label>Тип угрозы:</label>
-                    <p>{{ .threatType.Name }} (Категория: {{ .category.Name }})</p>
-                </div>
-
-                <div class="field">
-                    <label>Факты:</label>
-                    {{ if .facts }}
-                        {{ range .facts }}
-                            <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px; background-color: #f9f9f9;">
-                                <h3 style="margin-top: 0;">{{ .Title }}</h3>
-                                <p><strong>Описание:</strong> {{ .Description }}</p>
-                                <p><strong>Дата:</strong> {{ .CreatedAt }}</p>
-                                {{ if .ScreenshotURL }}
-                                    <img src="{{ .ScreenshotURL }}" alt="Скриншот" style="max-width: 400px; border: 1px solid #ccc; margin-top: 10px;">
-                                {{ else }}
-                                    <p><em>Скриншот не загружен.</em></p>
-                                {{ end }}
-                            </div>
-                        {{ end }}
-                    {{ else }}
-                        <p>Факты не найдены.</p>
-                    {{ end }}
-                </div>
+        <div class="request-detail-header">
+            <div class="detail-field">
+                <label>Сотрудник:</label>
+                <p>{{ .worker.FullName }}</p>
             </div>
-        <br><br>
-        <a href="/specialist">← Назад к списку</a>
-    </main>
+            
+            <div class="detail-field">
+                <label>Почта:</label>
+                <p>{{ .worker.Email }}</p>
+            </div>
+
+            <div class="detail-field">
+                <label>Дата создания:</label>
+                <p>{{ .request.CreatedAt }}</p>
+            </div>
+
+            <div class="detail-field">
+                <label>Тип угрозы:</label>
+                <p>{{ .threatType.Name }} (Категория: {{ .category.Name }})</p>
+            </div>
+
+            <div class="detail-field">
+                <label>Описание:</label>
+                <p>{{ .request.Description }}</p>
+            </div>
+        </div>
+
+        <div class="facts-section">
+            <h2>Факты и доказательства</h2>
+            
+            {{ if eq .userType "employee" }}
+            <div class="add-fact-form">
+                <h3>Добавить новый факт</h3>
+                <form method="POST" action="/create-fact" enctype="multipart/form-data">
+                    <input type="hidden" name="request_id" value="{{ .request.ID }}">
+                    
+                    <div class="form-group">
+                        <label>Название факта:</label>
+                        <input type="text" name="fact_title" required placeholder="Например: Скриншот вирусного окна">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Описание факта:</label>
+                        <textarea name="fact_description" rows="3" required placeholder="Подробное описание факта..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Скриншот:</label>
+                        <input type="file" name="screenshot" accept="image/*" required>
+                    </div>
+                    
+                    <button type="submit" class="button-add-fact">📤 Добавить факт</button>
+                </form>
+            </div>
+            {{ end }}
+            
+            {{ if .facts }}
+                {{ range .facts }}
+                    <div class="fact-item">
+                        <h3>{{ .Title }}</h3>
+                        <div class="fact-meta">
+                            Добавлено: {{ .CreatedAt }}
+                        </div>
+                        <div class="fact-description">
+                            {{ .Description }}
+                        </div>
+                        {{ if .ScreenshotURL }}
+                            <img src="{{ .ScreenshotURL }}" alt="Скриншот" class="fact-screenshot">
+                        {{ else }}
+                            <p style="color: #95a5a6;"><em>Скриншот не загружен.</em></p>
+                        {{ end }}
+                    </div>
+                {{ end }}
+            {{ else }}
+                <div class="no-facts">
+                    <p>Факты пока не добавлены. Добавьте первый факт выше!</p>
+                </div>
+            {{ end }}
+        </div>
+    </div>
 </body>
 </html>
