@@ -13,6 +13,7 @@
             <div class="user-info">
                 <span class="user-type">Специалист по безопасности</span>
                 <span class="user-name">{{ .userName }}</span>
+                <a href="/signup" class="nav-btn-small">Добавить пользователя</a>
                 <a href="/logout" class="logout-btn">Выход</a>
             </div>
         </div>
@@ -28,13 +29,12 @@
                     <button type="submit">🔍 Поиск</button>
                 </form>
                 {{ range .requests }}
+                    {{ if ne .Status "draft"}}
                     <div class="request-card status-{{ .Status }}">
                         <div class="request-header">
                             <div>
                                 <h3>#{{ .ID }} - Заявка</h3>
-                                {{ if eq .Status "draft" }}
-                                    <span class="status-badge status-{{ .Status }}">Черновик</span>
-                                {{ else if eq .Status "awaiting" }}
+                                {{ if eq .Status "awaiting" }}
                                     <span class="status-badge status-{{ .Status }}">Ожидает</span>
                                 {{ else if eq .Status "taken" }}
                                     <span class="status-badge status-{{ .Status }}">Принята</span>
@@ -58,6 +58,7 @@
                         
                         <a href="/request/{{ .ID }}" class="view-button">Просмотреть полную заявку →</a>
                     </div>
+                    {{ end }}
                 {{ end }}
             </div>
         {{ else }}

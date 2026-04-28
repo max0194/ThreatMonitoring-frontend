@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в систему мониторинга IT-угроз</title>
+    <link rel="stylesheet" href="/static/styles/style.css?v=20260225210416">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Система мониторинга IT-угроз</h1>
+            <div class="user-info">
+                <span class="user-type">Специалист по безопасности</span>
+                <span class="user-name">{{ .userName }}</span>
+                <a href="/specialist" class="nav-btn-small">Вернуться обратно</a>
+                <a href="/logout" class="logout-btn">Выход</a>
+            </div>
+        </div>
+    </header>
+    <div class="login-container">
+        <h2>Регистрация нового пользователя</h2>
+        {{if .Error}}
+            <div class="error">{{.Error}}</div>
+        {{end}}
+        <form method="POST" action="/register">
+            <div class="form-group">
+                <label>Тип пользователя:
+                    <select name="user_type" required>
+                        <option value="employee">Сотрудник</option>
+                        <option value="specialist">Специалист</option>
+                    </select>
+                </label>
+                <label>Полное имя: <input type="text" name="full_name" required></label>
+                <label>Email: <input type="email" name="email" required></label>
+                <label>Телефон: <input type="text" name="phone" required></label>
+                <label>Пароль: <input type="password" name="password" minlength="8"></label>
+            </div>
+            <button class="wide-button" type="submit">Зарегистрироваться</button>
+        </form>
+    </div>
+</body>
+</html>
