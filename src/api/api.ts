@@ -158,18 +158,39 @@ export const fetchRequestFacts = async (requestId: number): Promise<RequestFact[
   return body.facts as RequestFact[]
 }
 
-export const createFact = async (requestId: number, title: string, description: string, file: File): Promise<void> => {
-  const formData = new FormData()
-  formData.append('title', title)
-  formData.append('description', description)
-  formData.append('screenshot', file)
+export const createFact = async (
+  requestId: number,
+  title: string,
+  description: string,
+  file: File
+): Promise<void> => {
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('description', description);
+  formData.append('screenshot', file);
 
-  const response = await axios.post(`/api/requests/${requestId}/facts`, {
-    formData,
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка создания факта')
+  try {
+    const response = await axios.post(
+      `/api/requests/${requestId}/facts`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    const body = response.data;
+    if (body.status !== 'ok') {
+      throw new Error(body?.message || 'Ошибка создания факта');
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        `HTTP ошибка: ${error.response?.status} - ${error.message}`
+      );
+    }
+    throw error;
   }
-}
+};

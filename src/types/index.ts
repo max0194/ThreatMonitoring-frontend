@@ -47,3 +47,17 @@ export interface Service {
   imageUrl: string
   status: string
 }
+
+export interface CreateFactRequest {
+  title: string;
+  description: string;
+  screenshot?: File;
+}
+
+export interface RequestFactsResponse {
+  facts: RequestFact[];
+}
+
+export interface RequestsListResponse {
+  requests: RequestItem[];
+}

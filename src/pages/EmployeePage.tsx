@@ -4,9 +4,11 @@ import { createRequest } from '../api/api'
 import { useNavigate } from 'react-router-dom'
 
 const threatTypes = [
-  { id: 1, name: 'Атака на сеть' },
-  { id: 2, name: 'Необычная активность' },
-  { id: 3, name: 'Уязвимость' },
+  { id: 1, name: 'Троян' },
+  { id: 2, name: 'Рансомваре' },
+  { id: 3, name: 'Email фишинг' },
+  { id: 4, name: 'SMS фишинг' },
+  { id: 5, name: 'HTTP Flood' },
 ]
 
 export const EmployeePage = () => {
