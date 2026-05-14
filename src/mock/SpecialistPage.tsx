@@ -90,7 +90,7 @@ export const MockSpecialistPage = () => {
                   <th>Категория</th>
                   <th>Дата</th>
                   <th>Статус</th>
-                  <th>Действие</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Card, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
+import { Badge, Button, Card, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { fetchRequests } from '../api/api'
 import { RequestItem } from '../types'
@@ -65,7 +65,7 @@ export const SpecialistPage = () => {
                   <th>Категория</th>
                   <th>Дата</th>
                   <th>Статус</th>
-                  <th>Действие</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -75,7 +75,27 @@ export const SpecialistPage = () => {
                     <td>{item.title}</td>
                     <td>{item.threat_type?.name || 'Не указано'}</td>
                     <td>{item.created_at.slice(0, 10)}</td>
-                    <td>{item.status}</td>
+                    <td>                      
+                      <Badge 
+                        bg={
+                            item.status === 'draft'
+                            ? 'secondary'
+                            : item.status === 'awaiting'
+                            ? 'warning'
+                            : item.status === 'taken'
+                            ? 'info'
+                            : 'success'
+                            }>
+                              {item.status === 'draft'
+                              ? 'Черновик'
+                              : item.status === 'awaiting'
+                              ? 'Ожидает'
+                              : item.status === 'taken'
+                              ? 'Принята'
+                              : 'Закрыта'
+                              } 
+                      </Badge>   
+                    </td>
                     <td>
                       <Button size="sm" variant="outline-primary" onClick={() => navigate(`/request/${item.id}`)}>
                         Просмотр
