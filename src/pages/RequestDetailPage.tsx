@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Card, Col, Form, Row, Spinner, Alert, Badge } from 'react-bootstrap'
-import { fetchRequestById, updateRequestStatus, deleteRequest, fetchRequestFacts, createFact, submitRequest, completeRequest } from '../api/api'
+import { requestsController } from '../api/http-controller'
 import { RequestItem, RequestFact, User } from '../types'
 
 interface Props {
@@ -29,7 +29,7 @@ export const RequestDetailPage = ({ user }: Props) => {
     const load = async () => {
       setLoading(true)
       try {
-        const req = await fetchRequestById(requestId)
+        const req = await requestsController.getRequest(requestId)
         if (!req) {
           setError('Заявка не найдена')
           setLoading(false)
@@ -37,7 +37,7 @@ export const RequestDetailPage = ({ user }: Props) => {
         }
         setRequest(req)
 
-        const factsList = await fetchRequestFacts(requestId)
+        const factsList = await requestsController.getRequestFacts(requestId)
         setFacts(factsList)
       } catch (err) {
         setError((err as Error).message)
@@ -67,16 +67,16 @@ export const RequestDetailPage = ({ user }: Props) => {
     setAddingFact(true)
     setError('')
     try {
-      await createFact(requestId, factTitle, factDescription, factFile)
+      await requestsController.createRequestFact(requestId, { title: factTitle, description: factDescription, screenshot: factFile })
       setSuccess('Факт успешно добавлен')
       setFactTitle('')
       setFactDescription('')
       setFactFile(null)
 
-      const updatedFacts = await fetchRequestFacts(requestId)
+      const updatedFacts = await requestsController.getRequestFacts(requestId)
       setFacts(updatedFacts)
 
-      const updatedRequest = await fetchRequestById(requestId)
+      const updatedRequest = await requestsController.getRequest(requestId)
       if (updatedRequest) {
         setRequest(updatedRequest)
       }
@@ -91,9 +91,9 @@ export const RequestDetailPage = ({ user }: Props) => {
     setActionLoading(true)
     setError('')
     try {
-      await submitRequest(requestId)
+      await requestsController.takeRequest(requestId)
       setSuccess('Заявка успешно принята')
-      const updated = await fetchRequestById(requestId)
+      const updated = await requestsController.getRequest(requestId)
       if (updated) setRequest(updated)
     } catch (err) {
       setError((err as Error).message)
@@ -107,12 +107,12 @@ export const RequestDetailPage = ({ user }: Props) => {
     setError('')
     try {
       if (user?.user_type === 'specialist') {
-        await completeRequest(requestId, 'closed')
+        await requestsController.closeRequest(requestId)
       } else {
-        await updateRequestStatus(requestId, 'closed')
+        await requestsController.updateRequest(requestId, { status: 'closed' })
       }
       setSuccess('Заявка успешно закрыта')
-      const updated = await fetchRequestById(requestId)
+      const updated = await requestsController.getRequest(requestId)
       if (updated) setRequest(updated)
     } catch (err) {
       setError((err as Error).message)
@@ -129,7 +129,7 @@ export const RequestDetailPage = ({ user }: Props) => {
     setActionLoading(true)
     setError('')
     try {
-      await deleteRequest(requestId)
+      await requestsController.deleteRequest(requestId)
       setSuccess('Заявка успешно удалена')
       setTimeout(() => {
         navigate(user?.user_type === 'employee' ? '/employee/requests' : '/specialist')
@@ -316,7 +316,7 @@ export const RequestDetailPage = ({ user }: Props) => {
                   <p className="text-muted small mb-2">
                     Добавлено: {new Date(fact.created_at).toLocaleDateString('ru-RU')}
                   </p>
-                  <p className="mb-3">{fact.description}</p>
+                  <p className="text-muted mb-3">{fact.description}</p>
                   {fact.screenshot_url && (
                     <img
                       src={fact.screenshot_url}

@@ -68,7 +68,7 @@ const mockRequestsFacts: RequestFact[] = [{
 },
 ]
 
-export const MockRequestDetailPage = () => {
+export const MockRequestDetailPage = ({ user }: Props) => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const requestId = id ? parseInt(id) : 0
@@ -211,11 +211,11 @@ export const MockRequestDetailPage = () => {
             <div className="facts-list">
               {facts.map((fact) => (
                 <div key={fact.id} className="mb-4 pb-4 border-bottom">
-                  <h5 className="mb-2">{fact.title}</h5>
+                  <h5 className="text-muted mb-2">{fact.title}</h5>
                   <p className="text-muted small mb-2">
                     Добавлено: {new Date(fact.created_at).toLocaleDateString('ru-RU')}
                   </p>
-                  <p className="mb-3">{fact.description}</p>
+                  <p className="text-muted mb-3">{fact.description}</p>
                     <img
                       src={fact.screenshot_url === "1" ? url1 : fact.screenshot_url === "2" ? url2 : url3}
                       alt={fact.title}

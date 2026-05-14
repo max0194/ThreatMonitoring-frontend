@@ -1,175 +1,235 @@
-import { RequestItem, RequestFact, User, UserType } from '../types'
-import axios from 'axios'
+/* eslint-disable */
+/* tslint:disable */
+// @ts-nocheck
+/*
+ * ---------------------------------------------------------------
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
+ * ##                                                           ##
+ * ## AUTHOR: acacode                                           ##
+ * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
+ * ---------------------------------------------------------------
+ */
 
-const DEFAULT_HEADERS = {
-  'Content-Type': 'application/json',
-}
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export const loginUser = async (email: string, password: string, userType: UserType): Promise<User> => {
-  const response = await axios.post('/api/auth/login', {
-      email,
-      password,
-      user_type: userType,
-      withCredentials: true
+export class Api<SecurityDataType = unknown> {
+  http: HttpClient<SecurityDataType>;
+
+  constructor(http: HttpClient<SecurityDataType>) {
+    this.http = http;
+  }
+
+  /**
+   * @description Позволяет зайти за пользователя, используя его данные.
+   *
+   * @tags auth
+   * @name AuthLoginCreate
+   * @summary Зайти за пользователя
+   * @request POST:/api/auth/login
+   */
+  authLoginCreate = (params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/auth/login`,
+      method: "POST",
+      type: ContentType.Json,
+      ...params,
     });
-
-    const body = response.data;
-
-    if (body.status !== 'ok') {
-      throw new Error(body.message || 'Ошибка входа');
-    }
-
-    return body.user as User;
-}
-
-export const logoutUser = async (): Promise<void> => {
-  await axios.post('/api/auth/logout', {
-    withCredentials: true,
-  })
-}
-
-export const getCurrentUser = async (): Promise<User | null> => {
-  try {
-    const response = await axios.get('/api/auth/profile', {
-      withCredentials: true,
-    })
-    const body = await response.data
-    if (body.status !== 'ok') {
-      return null
-    }
-    return body.user as User
-  } catch {
-    return null
-  }
-}
-
-export const fetchRequests = async (): Promise<RequestItem[]> => {
-  const response = await axios.get('/api/requests', {
-    withCredentials: true,
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body.message || 'Ошибка загрузки заявок')
-  }
-  return (body.requests || []) as RequestItem[]
-}
-
-export const createRequest = async (title: string, description: string, threatTypeId: number): Promise<void> => {
-  const response = await axios.post('/api/requests', {
-    title, 
-    description, 
-    threat_type_id: threatTypeId,
-    withCredentials: true,
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body.message || 'Ошибка загрузки заявок')
-  }
-}
-
-export const registerUser = async (email: string, password: string, fullName: string, phone: string, userType: UserType): Promise<void> => {
-  const response = await axios.post('/api/auth/register', {
-    email, 
-    password, 
-    full_name: fullName, 
-    phone, 
-    user_type: userType,
-    withCredentials: true,
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body.message || 'Ошибка регистрации пользователя')
-  }
-}
-
-export const fetchRequestById = async (id: number): Promise<RequestItem | null> => {
-  const response = await axios.get(`/api/requests/${id}`, {
-    withCredentials: true,
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    return null
-  }
-  return body.request as RequestItem
-}
-
-export const updateRequestStatus = async (id: number, status: string): Promise<void> => {
-  const response = await axios.put(`/api/requests/${id}`, {
-    status,
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка обновления статуса')
-  }
-}
-
-export const submitRequest = async (id: number): Promise<void> => {
-  const response = await axios.put(`/api/requests/${id}/submit`, {
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка принятия заявки')
-  }
-}
-
-export const completeRequest = async (id: number, status: string): Promise<void> => {
-  const response = await axios.put(`/api/requests/${id}/complete`, {
-    status,
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка завершения заявки')
-  }
-}
-
-export const updateRequestContent = async (id: number, title: string, description: string): Promise<void> => {
-  const response = await axios.put(`/api/requests/${id}`, {
-    title, 
-    description,
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка обновления заявки')
-  }
-}
-
-export const deleteRequest = async (id: number): Promise<void> => {
-  const response = await axios.delete(`/api/requests/${id}`, {
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка удаления заявки')
-  }
-}
-
-export const fetchRequestFacts = async (requestId: number): Promise<RequestFact[]> => {
-  const response = await axios.get(`/api/requests/${requestId}/facts`, {
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body.message || 'Ошибка загрузки фактов')
-  }
-  return body.facts as RequestFact[]
-}
-
-export const createFact = async (requestId: number, title: string, description: string, file: File): Promise<void> => {
-  const formData = new FormData()
-  formData.append('title', title)
-  formData.append('description', description)
-  formData.append('screenshot', file)
-
-  const response = await axios.post(`/api/requests/${requestId}/facts`, {
-    formData,
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка создания факта')
-  }
+  /**
+   * @description Завершает текущую авторизованную сессию.
+   *
+   * @tags auth
+   * @name AuthLogoutCreate
+   * @summary Выход из системы
+   * @request POST:/api/auth/logout
+   * @secure
+   */
+  authLogoutCreate = (params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/auth/logout`,
+      method: "POST",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Позволяет зарегистрировать пользователя. Необходим вход за специалиста.
+   *
+   * @tags auth
+   * @name AuthRegisterCreate
+   * @summary Зарегистрировать пользователя
+   * @request POST:/api/auth/register
+   * @secure
+   */
+  authRegisterCreate = (params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/auth/register`,
+      method: "POST",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Возвращает список заявок. Доступно только после авторизации.
+   *
+   * @tags requests
+   * @name RequestsList
+   * @summary Получить список заявок
+   * @request GET:/api/requests
+   * @secure
+   */
+  requestsList = (
+    query?: {
+      /** Статус заявки */
+      status?: string;
+      /** Дата от (YYYY-MM-DD) */
+      date_from?: string;
+      /** Дата до (YYYY-MM-DD) */
+      date_to?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.http.request<void, void>({
+      path: `/api/requests`,
+      method: "GET",
+      query: query,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Создает новую заявку для авторизованного пользователя.
+   *
+   * @tags requests
+   * @name RequestsCreate
+   * @summary Создать заявку
+   * @request POST:/api/requests
+   * @secure
+   */
+  requestsCreate = (params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/requests`,
+      method: "POST",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Возвращает заявку по ID. Доступно только после авторизации.
+   *
+   * @tags requests
+   * @name RequestsDetail
+   * @summary Получить заявку
+   * @request GET:/api/requests/{id}
+   * @secure
+   */
+  requestsDetail = (id: any, params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/requests/${id}`,
+      method: "GET",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Обновляет существующую заявку, если пользователь является её создателем.
+   *
+   * @tags requests
+   * @name RequestsUpdate
+   * @summary Обновить заявку
+   * @request PUT:/api/requests/{id}
+   * @secure
+   */
+  requestsUpdate = (id: any, params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/requests/${id}`,
+      method: "PUT",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Удаляет заявку, если у пользователя есть право на это.
+   *
+   * @tags requests
+   * @name RequestsDelete
+   * @summary Удалить заявку
+   * @request DELETE:/api/requests/{id}
+   * @secure
+   */
+  requestsDelete = (id: any, params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/requests/${id}`,
+      method: "DELETE",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Специалист завершает заявку со статусом closed или rejected.
+   *
+   * @tags requests
+   * @name RequestsCompleteUpdate
+   * @summary Завершить заявку
+   * @request PUT:/api/requests/{id}/complete
+   * @secure
+   */
+  requestsCompleteUpdate = (id: any, params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/requests/${id}/complete`,
+      method: "PUT",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Возвращает список фактов для заявки. Требуется авторизация.
+   *
+   * @tags requests
+   * @name RequestsFactsList
+   * @summary Получить факты заявки
+   * @request GET:/api/requests/{id}/facts
+   * @secure
+   */
+  requestsFactsList = (id: any, params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/requests/${id}/facts`,
+      method: "GET",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Создает новый факт для заявки. Требуется авторизация сотрудника.
+   *
+   * @tags requests
+   * @name RequestsFactsCreate
+   * @summary Добавить факт к заявке
+   * @request POST:/api/requests/{id}/facts
+   * @secure
+   */
+  requestsFactsCreate = (id: any, params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/requests/${id}/facts`,
+      method: "POST",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Специалист принимает заявку для обработки.
+   *
+   * @tags requests
+   * @name RequestsSubmitUpdate
+   * @summary Взять заявку в работу
+   * @request PUT:/api/requests/{id}/submit
+   * @secure
+   */
+  requestsSubmitUpdate = (id: any, params: RequestParams = {}) =>
+    this.http.request<void, void>({
+      path: `/api/requests/${id}/submit`,
+      method: "PUT",
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
 }

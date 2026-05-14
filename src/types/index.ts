@@ -47,3 +47,44 @@ export interface Service {
   imageUrl: string
   status: string
 }
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+  user_type: string;
+}
+
+export interface LoginResponse {
+  status: string;
+  token: string;
+  user: User;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  full_name: string;
+  phone: string;
+  user_type: string;
+}
+
+export interface UpdateRequestRequest {
+  title?: string;
+  description?: string;
+  status?: string;
+  threat_type_id?: number;
+}
+
+export interface CreateFactRequest {
+  title: string;
+  description: string;
+  screenshot?: File;
+}
+
+export interface RequestFactsResponse {
+  facts: RequestFact[];
+}
+
+export interface RequestsListResponse {
+  requests: RequestItem[];
+}

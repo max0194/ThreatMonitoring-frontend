@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react'
 import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import { registerUser } from '../api/api'
+import { authController } from '../api/http-controller'
 import { UserType } from '../types'
 
 export const RegisterPage = () => {
@@ -22,7 +22,7 @@ export const RegisterPage = () => {
     setLoading(true)
 
     try {
-      await registerUser(email, password, fullName, phone, userType)
+      await authController.register({ email, password, full_name: fullName, phone, user_type: userType })
       setSuccess('Пользователь успешно зарегистрирован.')
       setEmail('')
       setPassword('')

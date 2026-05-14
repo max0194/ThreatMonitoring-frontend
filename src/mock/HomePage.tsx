@@ -1,6 +1,5 @@
 import { Button, Card, Col, Row } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import { User } from '../types'
 
 export const MockHomePage = () => (
   <Card className="hero-card p-4 mb-4">
@@ -8,8 +7,7 @@ export const MockHomePage = () => (
       <Col>
         <h1 className="page-heading">Система мониторинга IT-угроз</h1>
         <p>
-          Добро пожаловать в систему внутреннего мониторинга ИТ-угроз. Чтобы начать работу,
-          войдите в систему с вашей корпоративной учетной записью.
+          Добро пожаловать в систему внутреннего мониторинга ИТ-угроз.
         </p>
         <div className="d-flex gap-2">
           <Link to="/employee/requests">

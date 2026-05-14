@@ -1,7 +1,9 @@
 import { FormEvent, useState } from 'react'
 import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
-import { createRequest } from '../api/api'
+import { requestsController } from '../api/http-controller'
 import { useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { createRequest } from '../store/requests'
 
 const threatTypes = [
   { id: 1, name: 'Атака на сеть' },
@@ -10,30 +12,23 @@ const threatTypes = [
 ]
 
 export const EmployeePage = () => {
+  const dispatch = useAppDispatch()
+  const { loading, error, success } = useAppSelector((state) => state.requests)
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [threatTypeId, setThreatTypeId] = useState(1)
-  const [success, setSuccess] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setError('')
-    setSuccess('')
-    setLoading(true)
-
-    try {
-      await createRequest(title, description, threatTypeId)
-      setSuccess('Заявка успешно создана. Перейдите в раздел «Мои заявки».')
+    const result = await dispatch(
+      createRequest({ title, description, threat_type_id: threatTypeId })
+    )
+    if (createRequest.fulfilled.match(result)) {
       setTitle('')
       setDescription('')
       setThreatTypeId(1)
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setLoading(false)
     }
   }
 

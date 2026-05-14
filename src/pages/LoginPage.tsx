@@ -1,35 +1,28 @@
 import { FormEvent, useState } from 'react'
 import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import { loginUser } from '../api/api'
-import { User, UserType } from '../types'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { login } from '../store/auth'
 
-interface Props {
-  onLoginSuccess: (user: User) => void
-}
+export const LoginPage = () => {
+  const dispatch = useAppDispatch()
 
-export const LoginPage = ({ onLoginSuccess }: Props) => {
+  const { loading, error } = useAppSelector((state) => state.auth)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [userType, setUserType] = useState<UserType>('employee')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setError('')
-    setLoading(true)
 
-    try {
-      const user = await loginUser(email, password, userType)
-      onLoginSuccess(user)
-      navigate(`/${user.user_type}`, { replace: true })
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setLoading(false)
-    }
+  const result = await dispatch(
+    login({ email, password })
+  )
+  if (login.fulfilled.match(result)) {
+    navigate(`/${result.payload.user_type}`, {
+      replace: true,
+    })
+  }
   }
 
   return (
