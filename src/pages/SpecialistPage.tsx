@@ -1,0 +1,93 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Button, Card, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom'
+import { fetchRequests } from '../api/api'
+import { RequestItem } from '../types'
+
+export const SpecialistPage = () => {
+  const [requests, setRequests] = useState<RequestItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [query, setQuery] = useState('')
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true)
+      try {
+        const items = await fetchRequests()
+        setRequests(items.filter((item) => item.status !== 'draft' && item.status !== 'closed' && item.status !== 'rejected'))
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const filteredRequests = useMemo(
+    () =>
+      (requests || []).filter((item) =>
+        item.title.toLowerCase().includes(query.toLowerCase()) || item.description.toLowerCase().includes(query.toLowerCase()),
+      ),
+    [requests, query],
+  )
+
+  return (
+    <Row>
+      <Col>
+        <Card className="p-4 mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h2>Панель специалиста</h2>
+              <p>Специалист видит все открытые заявки и может принимать их в работу.</p>
+            </div>
+            <div className="d-flex gap-2">
+              <Button variant="outline-secondary" onClick={() => navigate('/specialist/register')}>
+                Зарегистрировать пользователя
+              </Button>
+            </div>
+          </div>
+          <Form.Group className="mb-3" controlId="searchRequestsSpecialist">
+            <Form.Label>Поиск по заявкам</Form.Label>
+            <Form.Control placeholder="Название или описание" value={query} onChange={(event) => setQuery(event.target.value)} />
+          </Form.Group>
+          {loading ? (
+            <div className="text-center py-5">
+              <Spinner animation="border" />
+            </div>
+          ) : filteredRequests.length === 0 ? (
+            <div className="no-results">Нет открытых заявок для отображения.</div>
+          ) : (
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Заголовок</th>
+                  <th>Категория</th>
+                  <th>Дата</th>
+                  <th>Статус</th>
+                  <th>Действие</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredRequests.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.id}</td>
+                    <td>{item.title}</td>
+                    <td>{item.threat_type?.name || 'Не указано'}</td>
+                    <td>{item.created_at.slice(0, 10)}</td>
+                    <td>{item.status}</td>
+                    <td>
+                      <Button size="sm" variant="outline-primary" onClick={() => navigate(`/request/${item.id}`)}>
+                        Просмотр
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </Card>
+      </Col>
+    </Row>
+  )
+}

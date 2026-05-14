@@ -1,0 +1,9 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" rx="24" fill="#2A2F3D" />
+  <g transform="translate(40 70)">
+    <rect width="320" height="160" rx="16" fill="#1B1F2A" />
+    <path d="M20 80 L60 40 L100 80 L140 40 L180 80" fill="none" stroke="#4F8EF7" stroke-width="12" stroke-linecap="round" />
+    <circle cx="80" cy="110" r="18" fill="#4F8EF7" />
+  </g>
+  <text x="200" y="260" text-anchor="middle" fill="#A0A8B8" font-size="18" font-family="Arial, sans-serif">No image available</text>
+</svg>
