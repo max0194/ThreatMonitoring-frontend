@@ -2,6 +2,7 @@ import { FC } from 'react'
 import { Container, Nav, Navbar, Button } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { User } from '../types'
+import { Breadcrumbs } from './Breadcrumbs'
 
 interface Props {
   user: User | null
@@ -11,32 +12,20 @@ interface Props {
 export const AppNavbar: FC<Props> = ({ user, onLogout }) => (
   <Navbar bg="darkgrey" variant="dark" className="navbar-border" expand="lg">
     <Container>
-      <Navbar.Brand as={Link} to="/">
+      <Navbar.Brand>
         Система мониторинга IT-угроз
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="main-navbar" />
       <Navbar.Collapse id="main-navbar">
         <Nav className="me-auto">
+          <Breadcrumbs/> 
           {!user && (
             <Nav.Link as={Link} to="/login">
               Вход
             </Nav.Link>
           )}
-          {user?.user_type === 'employee' && (
-            <>
-              <Nav.Link as={Link} to="/employee">
-                Создать заявку
-              </Nav.Link>
-              <Nav.Link as={Link} to="/employee/requests">
-                Мои заявки
-              </Nav.Link>
-            </>
-          )}
           {user?.user_type === 'specialist' && (
             <>
-              <Nav.Link as={Link} to="/specialist">
-                Заявки
-              </Nav.Link>
               <Nav.Link as={Link} to="/specialist/register">
                 Регистрация
               </Nav.Link>

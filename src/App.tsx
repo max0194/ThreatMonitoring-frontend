@@ -21,7 +21,7 @@ function AppRoutes({ user, onLoginSuccess, backendAvailable }: { user: User | nu
     return (
       <Routes>
         <Route path="*" element={<MockHomePage />} />
-        <Route path="/employee/requests" element={ <MockSpecialistPage /> } />
+        <Route path="/specialist" element={ <MockSpecialistPage /> } />
         <Route path="/request/:id" element={ <MockRequestDetailPage/>} />
       </Routes>
     )
@@ -31,8 +31,8 @@ function AppRoutes({ user, onLoginSuccess, backendAvailable }: { user: User | nu
     <Routes>
       <Route path="/" element={<HomePage user={user} />} />
       <Route path="/login" element={ user ? <Navigate replace to={`/${user.user_type}`} /> : <LoginPage onLoginSuccess={onLoginSuccess} /> } />
-      <Route path="/employee" element={user?.user_type === 'employee' ? <EmployeePage /> : <Navigate replace to="/login" />} />
-      <Route path="/employee/requests" element={user?.user_type === 'employee' ? <EmployeeRequestsPage /> : <Navigate replace to="/login" />} />
+      <Route path="/employee/create" element={user?.user_type === 'employee' ? <EmployeePage /> : <Navigate replace to="/login" />} />
+      <Route path="/employee" element={user?.user_type === 'employee' ? <EmployeeRequestsPage /> : <Navigate replace to="/login" />} />
       <Route path="/request/:id" element={user ? <RequestDetailPage user={user} /> : <Navigate replace to="/login" />} />
       <Route path="/specialist" element={user?.user_type === 'specialist' ? <SpecialistPage /> : <Navigate replace to="/login" />} />
       <Route path="/specialist/register" element={user?.user_type === 'specialist' ? <RegisterPage /> : <Navigate replace to="/login" />} />
@@ -81,31 +81,31 @@ function AppContent() {
     loadUser();
   }, []);
 
-useEffect(() => {
-  const checkBackend = async () => {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      const response = await axios.get('http://localhost:8080', {
-        signal: controller.signal
-      });
+        const response = await axios.get('http://localhost:8080', {
+          signal: controller.signal
+        });
 
-      clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
 
-      if (response.status >= 200 && response.status < 300) {
-        setBackendAvailable(true);
-      } else {
+        if (response.status >= 200 && response.status < 300) {
+          setBackendAvailable(true);
+        } else {
+          setBackendAvailable(false);
+        }
+      } catch (error) {
+        console.error('Backend check failed:', error);
         setBackendAvailable(false);
       }
-    } catch (error) {
-      console.error('Backend check failed:', error);
-      setBackendAvailable(false);
-    }
-  };
+    };
 
-  checkBackend();
-}, []);
+    checkBackend();
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -129,7 +129,7 @@ useEffect(() => {
 
   return (
     <>
-      <AppNavbar user={user} onLogout={handleLogout} />
+      <AppNavbar user={user} onLogout={handleLogout}/>
       <Container className="app-shell py-4">
         <AppRoutes user={user} onLoginSuccess={handleLoginSuccess} backendAvailable={backendAvailable} />
       </Container>

@@ -61,20 +61,10 @@ p {
 }
 
 .breadcrumbs li {
-  color: #c8c8c8;
-}
-
-.breadcrumbs li a {
+  color: #d0d0d0;
+  font-size: 1.25rem;
   text-decoration: none;
-  color: #c8c8c8;
-}
-
-.breadcrumbs li a:hover {
-  color: #ffffff;
-}
-
-.breadcrumb-item-active {
-  color: #ffffff;
+  
 }
 
 .card-default-image {

@@ -40,7 +40,7 @@ export const EmployeeRequestsPage = () => {
               <h2>Мои заявки</h2>
               <p>Список заявок сотрудника доступен сразу после создания учетной записи.</p>
             </div>
-            <Button variant="outline-secondary" onClick={() => navigate('/employee')}>
+            <Button variant="outline-secondary" onClick={() => navigate('/employee/create')}>
               Новая заявка
             </Button>
           </div>

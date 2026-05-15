@@ -70,9 +70,6 @@ export const EmployeePage = () => {
               <Button type="submit" disabled={loading}>
                 {loading ? 'Сохраняем...' : 'Создать заявку'}
               </Button>
-              <Button variant="outline-secondary" onClick={() => navigate('/employee/requests')}>
-                Мои заявки
-              </Button>
             </div>
           </Form>
         </Card>

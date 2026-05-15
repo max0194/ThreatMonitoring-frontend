@@ -2,32 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Badge, Button, Card, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { RequestItem } from '../types'
-
-const mockRequests: RequestItem[] = [{
-  id: 1,
-  title: "Ошибка в системе",
-  description: "Случайно поймал ошибку в системе",
-  status: "awaiting",
-  created_at: "2026-01-01",
-  result_count: 1
-},
-{
-  id: 2,
-  title: "Возник вирус",
-  description: "Скачался вирус, помогите",
-  status: "complete",
-  created_at: "2026-01-01",
-  result_count: 1
-},
-{
-  id: 3,
-  title: "Пропали файлы",
-  description: "В ходе работы пропали важные файлы",
-  status: "taken",
-  created_at: "2026-01-01",
-  result_count: 1
-},
-]
+import { mockRequests } from './mockData'
 
 export const MockSpecialistPage = () => {
   const [requests, setRequests] = useState<RequestItem[]>([])
@@ -64,11 +39,6 @@ export const MockSpecialistPage = () => {
             <div>
               <h2>Панель специалиста</h2>
               <p>Специалист видит все открытые заявки и может принимать их в работу.</p>
-            </div>
-            <div className="d-flex gap-2">
-              <Button variant="outline-secondary" onClick={() => navigate('/specialist/register')}>
-                Зарегистрировать пользователя
-              </Button>
             </div>
           </div>
           <Form.Group className="mb-3" controlId="searchRequestsSpecialist">
