@@ -61,3 +61,8 @@ export interface RequestFactsResponse {
 export interface RequestsListResponse {
   requests: RequestItem[];
 }
+
+export interface SimilarRequest
+  extends RequestItem {
+  similarity?: number
+}

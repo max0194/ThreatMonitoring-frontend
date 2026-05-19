@@ -1,16 +1,20 @@
 import { RequestItem, RequestFact, User, UserType } from '../types'
-import axios from 'axios'
+import axios , { AxiosError }from 'axios'
 
-const DEFAULT_HEADERS = {
-  'Content-Type': 'application/json',
+interface ApiError {
+  status: string
+  message: string
 }
 
 export const loginUser = async (email: string, password: string, userType: UserType): Promise<User> => {
-  const response = await axios.post('/api/auth/login', {
+  try {
+    const response = await axios.post('/api/auth/login', {
       email,
       password,
       user_type: userType,
-      withCredentials: true
+    },
+    {
+      withCredentials: true,
     });
 
     const body = response.data;
@@ -20,6 +24,17 @@ export const loginUser = async (email: string, password: string, userType: UserT
     }
 
     return body.user as User;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
+  }
 }
 
 export const logoutUser = async (): Promise<void> => {
@@ -33,129 +48,277 @@ export const getCurrentUser = async (): Promise<User | null> => {
     const response = await axios.get('/api/auth/profile', {
       withCredentials: true,
     })
-    const body = await response.data
+    const body = response.data
     if (body.status !== 'ok') {
       return null
     }
     return body.user as User
-  } catch {
-    return null
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
   }
 }
 
 export const fetchRequests = async (): Promise<RequestItem[]> => {
-  const response = await axios.get('/api/requests', {
-    withCredentials: true,
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body.message || 'Ошибка загрузки заявок')
+  try {
+    const response = await axios.get('/api/requests', {
+      withCredentials: true,
+    })
+    const body = response.data
+    if (body.status !== 'ok') {
+      throw new Error(body.message || 'Ошибка загрузки заявок')
   }
-  return (body.requests || []) as RequestItem[]
+  return body.requests as RequestItem[]
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
+  }
 }
 
 export const createRequest = async (title: string, description: string, threatTypeId: number): Promise<void> => {
-  const response = await axios.post('/api/requests', {
-    title, 
-    description, 
-    threat_type_id: threatTypeId,
-    withCredentials: true,
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body.message || 'Ошибка загрузки заявок')
+  try {
+    const response = await axios.post('/api/requests', {
+      title, 
+      description, 
+      threat_type_id: threatTypeId,
+    },
+    {
+      withCredentials: true,
+    });
+    const body = response.data
+    if (body.status !== 'ok') {
+      throw new Error(body.message || 'Ошибка загрузки заявок')
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
   }
 }
 
-export const registerUser = async (email: string, password: string, fullName: string, phone: string, userType: UserType): Promise<void> => {
-  const response = await axios.post('/api/auth/register', {
-    email, 
-    password, 
-    full_name: fullName, 
-    phone, 
-    user_type: userType,
-    withCredentials: true,
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body.message || 'Ошибка регистрации пользователя')
+export const registerUser = async (
+  email: string,
+  password: string,
+  fullName: string,
+  phone: string,
+  userType: UserType,
+): Promise<void> => {
+  try {
+    const response = await axios.post('/api/auth/register',
+      {
+        email,
+        password,
+        full_name: fullName,
+        phone,
+        user_type: userType,
+      },
+      {
+        withCredentials: true,
+      }
+    )
+
+    const body = response.data
+
+    if (body.status !== 'ok') {
+      throw new Error(body.message || 'Ошибка регистрации')
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
   }
 }
 
 export const fetchRequestById = async (id: number): Promise<RequestItem | null> => {
-  const response = await axios.get(`/api/requests/${id}`, {
-    withCredentials: true,
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    return null
+  try {
+    const response = await axios.get(`/api/requests/${id}`, {
+      withCredentials: true,
+    })
+    const body = response.data
+    if (body.status !== 'ok') {
+      return null
   }
-  return body.request as RequestItem
+  return body.request
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
+  }
 }
 
 export const updateRequestStatus = async (id: number, status: string): Promise<void> => {
-  const response = await axios.put(`/api/requests/${id}`, {
-    status,
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка обновления статуса')
+  try {
+    const response = await axios.put(`/api/requests/${id}`, {
+      status,
+    },
+    {
+      withCredentials: true,
+    });
+    const body = response.data
+    if (body.status !== 'ok') {
+      throw new Error(body?.message || 'Ошибка обновления статуса')
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
   }
 }
 
 export const submitRequest = async (id: number): Promise<void> => {
-  const response = await axios.put(`/api/requests/${id}/submit`, {
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка принятия заявки')
+  try {
+    const response = await axios.put(`/api/requests/${id}/submit`, {
+      withCredentials: true
+    })
+    const body = response.data
+    if (body.status !== 'ok') {
+      throw new Error(body?.message || 'Ошибка принятия заявки')
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
   }
 }
 
 export const completeRequest = async (id: number, status: string): Promise<void> => {
-  const response = await axios.put(`/api/requests/${id}/complete`, {
-    status,
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка завершения заявки')
+  try {
+    const response = await axios.put(`/api/requests/${id}/complete`, {
+      status,
+    },
+    {
+      withCredentials: true,
+    });
+    const body = response.data
+    if (body.status !== 'ok') {
+      throw new Error(body?.message || 'Ошибка завершения заявки')
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
   }
 }
 
 export const updateRequestContent = async (id: number, title: string, description: string): Promise<void> => {
-  const response = await axios.put(`/api/requests/${id}`, {
-    title, 
-    description,
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка обновления заявки')
+  try {
+    const response = await axios.put(`/api/requests/${id}`, {
+      title, 
+      description,
+    },
+    {
+      withCredentials: true,
+    });
+    const body = response.data
+    if (body.status !== 'ok') {
+      throw new Error(body?.message || 'Ошибка обновления заявки')
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
   }
 }
 
 export const deleteRequest = async (id: number): Promise<void> => {
-  const response = await axios.delete(`/api/requests/${id}`, {
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body?.message || 'Ошибка удаления заявки')
+  try {
+    const response = await axios.delete(`/api/requests/${id}`, {
+      withCredentials: true
+    })
+    const body = response.data
+    if (body.status !== 'ok') {
+      throw new Error(body?.message || 'Ошибка удаления заявки')
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
   }
 }
 
 export const fetchRequestFacts = async (requestId: number): Promise<RequestFact[]> => {
-  const response = await axios.get(`/api/requests/${requestId}/facts`, {
-    withCredentials: true
-  })
-  const body = await response.data
-  if (body.status !== 'ok') {
-    throw new Error(body.message || 'Ошибка загрузки фактов')
+  try {
+    const response = await axios.get(`/api/requests/${requestId}/facts`, {
+      withCredentials: true
+    })
+    const body = response.data
+    if (body.status !== 'ok') {
+      throw new Error(body.message || 'Ошибка загрузки фактов')
+    }
+    return body.facts as RequestFact[]
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
+      throw new Error(
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
+    }
+    throw err
   }
-  return body.facts as RequestFact[]
 }
 
 export const createFact = async (
@@ -185,12 +348,15 @@ export const createFact = async (
     if (body.status !== 'ok') {
       throw new Error(body?.message || 'Ошибка создания факта');
     }
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<ApiError>
+
       throw new Error(
-        `HTTP ошибка: ${error.response?.status} - ${error.message}`
-      );
+        axiosError.response?.data?.message ||
+        'Ошибка сервера'
+      )
     }
-    throw error;
+    throw err
   }
 };

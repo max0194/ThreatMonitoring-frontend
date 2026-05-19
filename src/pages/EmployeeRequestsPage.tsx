@@ -1,35 +1,37 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, Card, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
+import { useMemo, useState } from 'react'
+import { Badge, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { fetchRequests } from '../api/api'
 import { RequestItem } from '../types'
 
 export const EmployeeRequestsPage = () => {
-  const [requests, setRequests] = useState<RequestItem[]>([])
-  const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('')
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      try {
-        const items = await fetchRequests()
-        setRequests(items)
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [])
+  const { data: requests = [], isLoading } = useQuery<RequestItem[]>({
+    queryKey: ['requests'],
+    queryFn: fetchRequests,
+    staleTime: 1000,
+  })
 
-  const filteredRequests = useMemo(
-    () =>
-      (requests || []).filter((item) =>
-        item.title.toLowerCase().includes(filter.toLowerCase()) || item.description.toLowerCase().includes(filter.toLowerCase()),
-      ),
-    [requests, filter],
-  )
+  const filteredRequests = useMemo(() => {
+    if (!requests || requests.length === 0) {
+      return [];
+    }
+
+    const searchQuery = filter.toLowerCase();
+
+    return requests.filter((item) => {
+      const title = item.title ?? '';
+      const description = item.description ?? '';
+
+      return (
+        title.toLowerCase().includes(searchQuery) ||
+        description.toLowerCase().includes(searchQuery)
+      );
+    });
+  }, [requests, filter]);
 
   return (
     <Row>
@@ -48,61 +50,46 @@ export const EmployeeRequestsPage = () => {
             <Form.Label>Поиск по заявкам</Form.Label>
             <Form.Control placeholder="Название или описание" value={filter} onChange={(event) => setFilter(event.target.value)} />
           </Form.Group>
-          {loading ? (
+          {isLoading ? (
             <div className="text-center py-5">
               <Spinner animation="border" />
             </div>
           ) : filteredRequests.length === 0 ? (
-            <div className="no-results">Заявок пока нет или ничего не найдено.</div>
+            <div className="no-results">Нет открытых заявок для отображения.</div>
           ) : (
-            <Table striped bordered hover responsive>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Заголовок</th>
-                  <th>Дата</th>
-                  <th>Статус</th>
-                  <th>Факты</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
+            <Row>
                 {filteredRequests.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.id}</td>
-                    <td>{item.title}</td>
-                    <td>{item.created_at.slice(0, 10)}</td>
-                    <td>                      
+                  <Col key={item.id} md={6} lg={4} className="mb-4">
+                  <Card className="h-100">
+                    <Card.Body>
+                      <Card.Title>{item.title}</Card.Title>
+                      <Card.Subtitle>
                       <Badge 
                         bg={
-                            item.status === 'draft'
-                            ? 'secondary'
-                            : item.status === 'awaiting'
-                            ? 'warning'
-                            : item.status === 'taken'
-                            ? 'info'
+                            item.status === 'draft' ? 'secondary' 
+                            : item.status === 'awaiting' ? 'warning' 
+                            : item.status === 'taken' ? 'info'
                             : 'success'
                             }>
-                              {item.status === 'draft'
-                              ? 'Черновик'
-                              : item.status === 'awaiting'
-                              ? 'Ожидает'
-                              : item.status === 'taken'
-                              ? 'Принята'
+                              {item.status === 'draft' ? 'Черновик'
+                              : item.status === 'awaiting' ? 'Ожидает'
+                              : item.status === 'taken' ? 'Принята'
                               : 'Закрыта'
                               } 
-                      </Badge>   
-                    </td>
-                    <td>{item.result_count}</td>
-                    <td>
-                      <Button size="sm" variant="outline-primary" onClick={() => navigate(`/request/${item.id}`)}>
+                      </Badge>
+                      </Card.Subtitle>  
+                      <Card.Text className="text-muted">
+                        <p className="text-muted"><strong>Тип:</strong> {item.threat_type?.name || 'Не указано'}</p>
+                        <p className="text-muted"><strong>Дата:</strong> {item.created_at.slice(0, 10)}</p>
+                      </Card.Text>               
+                      <Button variant="outline-primary" onClick={() => navigate(`/request/${item.id}`)}>
                         Просмотр
                       </Button>
-                    </td>
-                  </tr>
+                    </Card.Body>    
+                  </Card>
+                  </Col>
                 ))}
-              </tbody>
-            </Table>
+            </Row>
           )}
         </Card>
       </Col>

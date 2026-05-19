@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react'
 import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
 import { createRequest } from '../api/api'
 import { useNavigate } from 'react-router-dom'
+import { queryClient } from '../main'
 
 const threatTypes = [
   { id: 1, name: 'Троян' },
@@ -32,6 +33,9 @@ export const EmployeePage = () => {
       setTitle('')
       setDescription('')
       setThreatTypeId(1)
+      queryClient.invalidateQueries({
+        queryKey: ['requests'],
+      })
     } catch (err) {
       setError((err as Error).message)
     } finally {

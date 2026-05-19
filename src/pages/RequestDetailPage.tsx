@@ -1,22 +1,24 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Card, Col, Form, Row, Spinner, Alert, Badge } from 'react-bootstrap'
-import { fetchRequestById, updateRequestStatus, deleteRequest, fetchRequestFacts, createFact, submitRequest, completeRequest } from '../api/api'
-import { RequestItem, RequestFact, User } from '../types'
+import { useQuery } from '@tanstack/react-query'
+import { queryClient } from '../main'
+import { fetchRequests, fetchRequestById, updateRequestStatus, deleteRequest, fetchRequestFacts, createFact, submitRequest, completeRequest } from '../api/api'
+import { RequestItem, RequestFact, User, SimilarRequest } from '../types'
+import { cosineSimilarity, getOrCreateEmbedding } from '../utils/embeddings'
 
 interface Props {
   user: User | null
 }
 
 export const RequestDetailPage = ({ user }: Props) => {
+  const [similarRequests, setSimilarRequests] = useState<SimilarRequest[]>([])
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const requestId = id ? parseInt(id) : 0
 
-  const [request, setRequest] = useState<RequestItem | null>(null)
-  const [facts, setFacts] = useState<RequestFact[]>([])
-  const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
+  const [similarLoading, setSimilarLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -25,31 +27,121 @@ export const RequestDetailPage = ({ user }: Props) => {
   const [factFile, setFactFile] = useState<File | null>(null)
   const [addingFact, setAddingFact] = useState(false)
 
+  const {
+    data: request,
+    isLoading: requestLoading,
+    } = useQuery<RequestItem | null>({
+      queryKey: ['request', requestId],
+      queryFn: () => fetchRequestById(requestId),
+      enabled: requestId > 0,
+      staleTime: 120000,
+  })
+
+  const {
+    data: facts = [],
+    isLoading: factsLoading,
+    } = useQuery<RequestFact[]>({
+      queryKey: ['requestfacts', requestId],
+      queryFn: () => fetchRequestFacts(requestId),
+      enabled: requestId > 0,
+      staleTime: 120000,
+  })
+
+  const { data: requests = [] } = useQuery({
+    queryKey: ['requests'],
+    queryFn: fetchRequests,
+    staleTime: 120000,
+  })
+
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
+    let active = true
+
+    async function calculateSimilarity() {
+      if (!request) {
+        return
+      }
+
+      setSimilarLoading(true)
+
       try {
-        const req = await fetchRequestById(requestId)
-        if (!req) {
-          setError('Заявка не найдена')
-          setLoading(false)
+        const candidateRequests =
+          requests.filter(
+            (r) =>
+              r.id !== request.id &&
+              r.threat_type?.id ===
+                request.threat_type?.id,
+          )
+
+        if (
+          candidateRequests.length === 0
+        ) {
+          setSimilarRequests([])
           return
         }
-        setRequest(req)
 
-        const factsList = await fetchRequestFacts(requestId)
-        setFacts(factsList)
+        const currentEmbedding =
+          await getOrCreateEmbedding(
+            request,
+          )
+
+        const scored =
+          await Promise.all(
+            candidateRequests.map(
+              async (r) => {
+                const embedding =
+                  await getOrCreateEmbedding(
+                    r,
+                  )
+
+                return {
+                  ...r,
+                  similarity:
+                    cosineSimilarity(
+                      currentEmbedding,
+                      embedding,
+                    ),
+                }
+              },
+            ),
+          )
+
+        if (!active) {
+          return
+        }
+
+        const similar = scored
+          .filter(
+            (x) =>
+              x.similarity > 0.3,
+          )
+          .sort(
+            (a, b) =>
+              b.similarity -
+              a.similarity,
+          )
+          .slice(0, 5)
+
+        setSimilarRequests(similar)
       } catch (err) {
-        setError((err as Error).message)
+        console.error(
+          'Similarity error:',
+          err,
+        )
       } finally {
-        setLoading(false)
+        if (active) {
+          setSimilarLoading(false)
+        }
       }
     }
 
-    if (requestId > 0) {
-      load()
+    calculateSimilarity()
+
+    return () => {
+      active = false
     }
-  }, [requestId])
+  }, [request, requests])
+
+  const loading = requestLoading || factsLoading
 
   const canAddFact = user?.user_type === 'employee' && request?.status !== 'closed'
   const canTakeRequest = user?.user_type === 'specialist' && request?.status === 'awaiting'
@@ -73,13 +165,13 @@ export const RequestDetailPage = ({ user }: Props) => {
       setFactDescription('')
       setFactFile(null)
 
-      const updatedFacts = await fetchRequestFacts(requestId)
-      setFacts(updatedFacts)
-
-      const updatedRequest = await fetchRequestById(requestId)
-      if (updatedRequest) {
-        setRequest(updatedRequest)
-      }
+      setSuccess('Заявка успешно принята')
+      queryClient.invalidateQueries({
+        queryKey: ['request', requestId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['requests'],
+      })
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -93,8 +185,12 @@ export const RequestDetailPage = ({ user }: Props) => {
     try {
       await submitRequest(requestId)
       setSuccess('Заявка успешно принята')
-      const updated = await fetchRequestById(requestId)
-      if (updated) setRequest(updated)
+      queryClient.invalidateQueries({
+        queryKey: ['request', requestId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['requests'],
+      })
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -112,8 +208,12 @@ export const RequestDetailPage = ({ user }: Props) => {
         await updateRequestStatus(requestId, 'closed')
       }
       setSuccess('Заявка успешно закрыта')
-      const updated = await fetchRequestById(requestId)
-      if (updated) setRequest(updated)
+      queryClient.removeQueries({
+        queryKey: ['request', requestId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['requests'],
+      })
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -134,6 +234,12 @@ export const RequestDetailPage = ({ user }: Props) => {
       setTimeout(() => {
         navigate(user?.user_type === 'employee' ? '/employee/requests' : '/specialist')
       }, 1000)
+      queryClient.removeQueries({
+        queryKey: ['request', requestId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['requests'],
+      })
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -165,9 +271,6 @@ export const RequestDetailPage = ({ user }: Props) => {
   return (
     <Row>
       <Col>
-        <Button variant="outline-secondary" size="sm" onClick={() => navigate(-1)} className="mb-3">
-          ← Назад к списку
-        </Button>
         <Card className="p-4 mb-4">
           <div className="d-flex justify-content-between align-items-start mb-3">
             <div>
@@ -217,39 +320,39 @@ export const RequestDetailPage = ({ user }: Props) => {
           <Row className="mb-4">
             <Col md={6}>
               <div className="mb-3">
-                <label className="text-muted small">Сотрудник</label>
-                <p className="fw-bold text-muted">{request.creator?.full_name || 'Неизвестно'}</p>
+                <label className="fw-bold text-muted">Сотрудник</label>
+                <p className="text-muted">{request.creator?.full_name || 'Неизвестно'}</p>
               </div>
             </Col>
             <Col md={6}>
               <div className="mb-3">
-                <label className="text-muted small">Email</label>
-                <p className="fw-bold text-muted">{request.creator?.email || 'Неизвестно'}</p>
+                <label className="fw-bold text-muted">Email</label>
+                <p className="text-muted">{request.creator?.email || 'Неизвестно'}</p>
               </div>
             </Col>
           </Row>
 
           <div className="mb-3">
-            <label className="text-muted small">Дата создания</label>
-            <p className="fw-bold text-muted">{new Date(request.created_at).toLocaleDateString('ru-RU')}</p>
+            <label className="fw-bold text-muted">Дата создания</label>
+            <p className="text-muted">{new Date(request.created_at).toLocaleDateString('ru-RU')}</p>
           </div>
 
           <div className="mb-3">
-            <label className="text-muted small">Тип угрозы</label>
-            <p className="fw-bold text-muted">
+            <label className="fw-bold text-muted">Тип угрозы</label>
+            <p className="text-muted">
               {request.threat_type?.name}
               {request.threat_type?.category && ` (${request.threat_type.category.name})`}
             </p>
           </div>
 
           <div className="mb-3">
-            <label className="text-muted small">Название</label>
-            <p className="fw-bold text-muted">{request.title}</p>
+            <label className="fw-bold text-muted">Название</label>
+            <p className="text-muted">{request.title}</p>
           </div>
 
           <div>
-            <label className="text-muted small">Описание</label>
-            <p className="text-muted text-muted">{request.description}</p>
+            <label className="fw-bold text-muted">Описание</label>
+            <p className="text-muted">{request.description}</p>
           </div>
         </Card>
 
@@ -330,6 +433,35 @@ export const RequestDetailPage = ({ user }: Props) => {
             </div>
           )}
         </Card>
+        {user?.user_type === 'specialist' && (
+          <Card className="p-4 mt-4">
+            <h4>Похожие заявки</h4>
+
+          {similarLoading ? (
+            <Spinner animation="border" />
+          ) : similarRequests.length === 0 ? (
+            <p className="text-muted">
+              Похожие заявки не найдены
+            </p>
+          ) : (
+            similarRequests.map((r) => (
+              <Card key={r.id}>
+                <div className="p-4 mb-4 card">
+                    <h5 className="mb-2">{r.title}</h5>
+                    <p className="text-muted small mb-2">
+                      Дата: {new Date(r.created_at).toLocaleDateString('ru-RU')}
+                    </p>
+                    <Badge bg="secondary">
+                      {r.threat_type?.name}
+                    </Badge>
+                  <Button size="sm" variant="outline-primary" className="small" onClick={() => navigate(`/request/${r.id}`)}>
+                    Просмотр
+                  </Button>
+                </div>
+              </Card>
+            ))
+          )}
+        </Card>)}
       </Col>
     </Row>
   )
