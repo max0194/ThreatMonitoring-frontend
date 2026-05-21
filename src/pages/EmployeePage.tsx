@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react'
 import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
-import { createRequest } from '../api/api'
+import { requestsController } from '../api/http-controller'
 import { useNavigate } from 'react-router-dom'
 import { queryClient } from '../main'
 
@@ -28,7 +28,7 @@ export const EmployeePage = () => {
     setLoading(true)
 
     try {
-      await createRequest(title, description, threatTypeId)
+      await requestsController.createRequest({title, description, threat_type_id: threatTypeId})
       setSuccess('Заявка успешно создана. Перейдите в раздел «Мои заявки».')
       setTitle('')
       setDescription('')
@@ -48,7 +48,7 @@ export const EmployeePage = () => {
       <Col>
         <Card className="p-4 mb-4">
           <h2>Создание заявки</h2>
-          <p>Сотрудник сразу видит форму для создания новой заявки.</p>
+          <p className="text-muted">Сотрудник сразу видит форму для создания новой заявки.</p>
           {success && <Alert variant="success">{success}</Alert>}
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>

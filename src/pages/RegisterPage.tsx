@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react'
 import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import { registerUser } from '../api/api'
+import { authController } from '../api/http-controller'
 import { UserType } from '../types'
 
 export const RegisterPage = () => {
@@ -22,7 +22,7 @@ export const RegisterPage = () => {
     setLoading(true)
 
     try {
-      await registerUser(email, password, fullName, phone, userType)
+      await authController.registerUser({email, password, full_name: fullName, phone, user_type: userType})
       setSuccess('Пользователь успешно зарегистрирован.')
       setEmail('')
       setPassword('')
@@ -43,11 +43,8 @@ export const RegisterPage = () => {
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
               <h2>Регистрация нового пользователя</h2>
-              <p>Специалист может зарегистрировать сотрудника или другого специалиста.</p>
+              <p className="text-muted">Специалист может зарегистрировать сотрудника или другого специалиста.</p>
             </div>
-            <Button variant="outline-secondary" onClick={() => navigate('/specialist')}>
-              Назад
-            </Button>
           </div>
           {success && <Alert variant="success">{success}</Alert>}
           {error && <Alert variant="danger">{error}</Alert>}

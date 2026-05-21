@@ -37,15 +37,31 @@ export interface RequestItem {
   request_facts?: RequestFact[]
 }
 
-export interface Service {
-  id: number
-  title: string
-  description: string
-  category: string
-  date: string
-  price: number
-  imageUrl: string
-  status: string
+export interface LoginRequest {
+  email: string;
+  password: string;
+  user_type: string;
+}
+
+export interface LoginResponse {
+  status: string;
+  token: string;
+  user: User;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  full_name: string;
+  phone: string;
+  user_type: string;
+}
+
+export interface UpdateRequestRequest {
+  title?: string;
+  description?: string;
+  status?: string;
+  threat_type_id?: number;
 }
 
 export interface CreateFactRequest {

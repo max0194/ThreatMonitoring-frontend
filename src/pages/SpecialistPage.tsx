@@ -2,16 +2,16 @@ import { useMemo, useState } from 'react'
 import { Badge, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { fetchRequests } from '../api/api'
+import { requestsController } from '../api/http-controller'
 import { RequestItem } from '../types'
 
 export const SpecialistPage = () => {
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
 
-  const { data: requests = [], isLoading } = useQuery<RequestItem[]>({
+  const { data: requests = [], isLoading } = useQuery({
     queryKey: ['requests'],
-    queryFn: fetchRequests,
+    queryFn: () => requestsController.fetchRequests(),
     staleTime: 120000,
   })
 
@@ -50,12 +50,7 @@ export const SpecialistPage = () => {
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
               <h2>Панель специалиста</h2>
-              <p>Специалист видит все открытые заявки и может принимать их в работу.</p>
-            </div>
-            <div className="d-flex gap-2">
-              <Button variant="outline-secondary" onClick={() => navigate('/specialist/register')}>
-                Зарегистрировать пользователя
-              </Button>
+              <p className="text-muted">Специалист видит все открытые заявки и может принимать их в работу.</p>
             </div>
           </div>
           <Form.Group className="mb-3" controlId="searchRequestsSpecialist">
@@ -75,7 +70,7 @@ export const SpecialistPage = () => {
                   <Card className="h-100">
                     <Card.Body>
                       <Card.Title>{item.title}</Card.Title>
-                      <Card.Subtitle>
+                      <Card.Text>
                       <Badge 
                         bg={
                             item.status === 'draft' ? 'secondary' 
@@ -89,11 +84,10 @@ export const SpecialistPage = () => {
                               : 'Закрыта'
                               } 
                       </Badge>
-                      </Card.Subtitle>  
-                      <Card.Text className="text-muted">
-                        <p className="text-muted"><strong>Тип:</strong> {item.threat_type?.name || 'Не указано'}</p>
-                        <p className="text-muted"><strong>Дата:</strong> {item.created_at.slice(0, 10)}</p>
-                      </Card.Text>               
+                      </Card.Text>  
+                      <Card.Text className="text-muted"><strong>Тип:</strong> {item.threat_type?.name || 'Не указано'}</Card.Text>   
+                      <Card.Text className="text-muted"><strong>Дата:</strong> {item.created_at.slice(0, 10)}</Card.Text>
+                      <Card.Text className="text-muted"><strong>Описание:</strong> {item.description || 'Не указано'}</Card.Text>       
                       <Button variant="outline-primary" onClick={() => navigate(`/request/${item.id}`)}>
                         Просмотр
                       </Button>

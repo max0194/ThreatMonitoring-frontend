@@ -6,6 +6,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './index.css'
 
+import { Provider } from 'react-redux'
+import { store } from './store/store'
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -17,9 +20,11 @@ export const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-      <ReactQueryDevtools initialIsOpen={true}/>
-    </QueryClientProvider>  
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <ReactQueryDevtools initialIsOpen={true}/>
+      </QueryClientProvider>
+   </Provider>  
   </React.StrictMode>,
 )

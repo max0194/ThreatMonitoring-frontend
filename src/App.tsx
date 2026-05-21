@@ -12,11 +12,12 @@ import { RegisterPage } from './pages/RegisterPage'
 import { MockHomePage } from './mock/HomePage'
 import { MockSpecialistPage } from './mock/SpecialistPage'
 import { MockRequestDetailPage } from './mock/RequestDetailPage'
-import { logoutUser, getCurrentUser } from './api/api'
+import { useAppDispatch, useAppSelector } from './store/hooks'
+import { logout } from './store/auth'
 import { User } from './types'
 import axios from "axios"
 
-function AppRoutes({ user, onLoginSuccess, backendAvailable }: { user: User | null; onLoginSuccess: (user: User) => void; backendAvailable: boolean }) {
+function AppRoutes({ user, backendAvailable }: { user: User | null; backendAvailable: boolean }) {
   if (!backendAvailable) {
     return (
       <Routes>
@@ -30,7 +31,7 @@ function AppRoutes({ user, onLoginSuccess, backendAvailable }: { user: User | nu
   return (
     <Routes>
       <Route path="/" element={<HomePage user={user} />} />
-      <Route path="/login" element={ user ? <Navigate replace to={`/${user.user_type}`} /> : <LoginPage onLoginSuccess={onLoginSuccess} /> } />
+      <Route path="/login" element={ user ? <Navigate replace to={`/${user.user_type}`} /> : <LoginPage /> } />
       <Route path="/employee/create" element={user?.user_type === 'employee' ? <EmployeePage /> : <Navigate replace to="/login" />} />
       <Route path="/employee" element={user?.user_type === 'employee' ? <EmployeeRequestsPage /> : <Navigate replace to="/login" />} />
       <Route path="/request/:id" element={user ? <RequestDetailPage user={user} /> : <Navigate replace to="/login" />} />
@@ -61,25 +62,18 @@ const clearUserFromStorage = () => {
 
 
 function AppContent() {
-  const [user, setUser] = useState<User | null>(getUserFromStorage());
-  const [backendAvailable, setBackendAvailable] = useState(true);
-  const navigate = useNavigate();
+  const dispatch = useAppDispatch()
 
-  useEffect(() => {
-    const loadUser = async () => {
-      const storedUser = getUserFromStorage();
-      if (storedUser) {
-        try {
-          const currentUser = await getCurrentUser();
-          setUser(currentUser);
-        } catch (error) {
-          setUser(null);
-          clearUserFromStorage();
-        }
-      }
-    };
-    loadUser();
-  }, []);
+  const user = useAppSelector(
+    (state) => state.auth.user
+  )
+  const [backendAvailable, setBackendAvailable] = useState(true)
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    await dispatch(logout())
+    navigate('/login', { replace: true })
+  }
 
   useEffect(() => {
     const checkBackend = async () => {
@@ -105,33 +99,13 @@ function AppContent() {
     };
 
     checkBackend();
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      saveUserToStorage(user);
-    } else {
-      clearUserFromStorage();
-    }
-  }, [user]);
-  
-  const handleLogout = async () => {
-    await logoutUser();
-    setUser(null);
-    clearUserFromStorage();
-    navigate('/login', { replace: true });
-  };
-
-  const handleLoginSuccess = (user: User) => {
-    setUser(user);
-    saveUserToStorage(user);
-  };
+  }, [navigate]);
 
   return (
     <>
-      <AppNavbar user={user} onLogout={handleLogout}/>
+      <AppNavbar user={user} onLogout={handleLogout} />
       <Container className="app-shell py-4">
-        <AppRoutes user={user} onLoginSuccess={handleLoginSuccess} backendAvailable={backendAvailable} />
+        <AppRoutes user={user} backendAvailable={backendAvailable} />
       </Container>
     </>
   )

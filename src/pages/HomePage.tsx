@@ -18,7 +18,7 @@ export const HomePage = ({ user }: Props) => (
           {user ? (
             <Link to={`/${user.user_type}`}>
               <Button variant="primary">
-                Перейти к профилю
+                Перейти к заявкам
               </Button>
             </Link>
           ) : (

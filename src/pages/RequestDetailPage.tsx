@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Card, Col, Form, Row, Spinner, Alert, Badge } from 'react-bootstrap'
 import { useQuery } from '@tanstack/react-query'
 import { queryClient } from '../main'
-import { fetchRequests, fetchRequestById, updateRequestStatus, deleteRequest, fetchRequestFacts, createFact, submitRequest, completeRequest } from '../api/api'
+import { requestsController } from '../api/http-controller'
 import { RequestItem, RequestFact, User, SimilarRequest } from '../types'
 import { cosineSimilarity, getOrCreateEmbedding } from '../utils/embeddings'
 
@@ -32,7 +32,7 @@ export const RequestDetailPage = ({ user }: Props) => {
     isLoading: requestLoading,
     } = useQuery<RequestItem | null>({
       queryKey: ['request', requestId],
-      queryFn: () => fetchRequestById(requestId),
+      queryFn: () => requestsController.fetchRequestById(requestId),
       enabled: requestId > 0,
       staleTime: 120000,
   })
@@ -42,14 +42,14 @@ export const RequestDetailPage = ({ user }: Props) => {
     isLoading: factsLoading,
     } = useQuery<RequestFact[]>({
       queryKey: ['requestfacts', requestId],
-      queryFn: () => fetchRequestFacts(requestId),
+      queryFn: () => requestsController.fetchRequestFacts(requestId),
       enabled: requestId > 0,
       staleTime: 120000,
   })
 
   const { data: requests = [] } = useQuery({
     queryKey: ['requests'],
-    queryFn: fetchRequests,
+    queryFn: () => requestsController.fetchRequests(),
     staleTime: 120000,
   })
 
@@ -159,7 +159,7 @@ export const RequestDetailPage = ({ user }: Props) => {
     setAddingFact(true)
     setError('')
     try {
-      await createFact(requestId, factTitle, factDescription, factFile)
+      await requestsController.createFact(requestId, factTitle, factDescription, factFile)
       setSuccess('Факт успешно добавлен')
       setFactTitle('')
       setFactDescription('')
@@ -183,7 +183,7 @@ export const RequestDetailPage = ({ user }: Props) => {
     setActionLoading(true)
     setError('')
     try {
-      await submitRequest(requestId)
+      await requestsController.submitRequest(requestId)
       setSuccess('Заявка успешно принята')
       queryClient.invalidateQueries({
         queryKey: ['request', requestId],
@@ -203,9 +203,7 @@ export const RequestDetailPage = ({ user }: Props) => {
     setError('')
     try {
       if (user?.user_type === 'specialist') {
-        await completeRequest(requestId, 'closed')
-      } else {
-        await updateRequestStatus(requestId, 'closed')
+        await requestsController.completeRequest(requestId)
       }
       setSuccess('Заявка успешно закрыта')
       queryClient.removeQueries({
@@ -229,7 +227,7 @@ export const RequestDetailPage = ({ user }: Props) => {
     setActionLoading(true)
     setError('')
     try {
-      await deleteRequest(requestId)
+      await requestsController.deleteRequest(requestId)
       setSuccess('Заявка успешно удалена')
       setTimeout(() => {
         navigate(user?.user_type === 'employee' ? '/employee/requests' : '/specialist')
@@ -446,18 +444,13 @@ export const RequestDetailPage = ({ user }: Props) => {
           ) : (
             similarRequests.map((r) => (
               <Card key={r.id}>
-                <div className="p-4 mb-4 card">
-                    <h5 className="mb-2">{r.title}</h5>
-                    <p className="text-muted small mb-2">
-                      Дата: {new Date(r.created_at).toLocaleDateString('ru-RU')}
-                    </p>
-                    <Badge bg="secondary">
-                      {r.threat_type?.name}
-                    </Badge>
-                  <Button size="sm" variant="outline-primary" className="small" onClick={() => navigate(`/request/${r.id}`)}>
-                    Просмотр
-                  </Button>
-                </div>
+                <Card.Body>
+                  <Card.Title className="mb-2">{r.title}</Card.Title>
+                  <Card.Text className="text-muted small mb-2"> Дата: {new Date(r.created_at).toLocaleDateString('ru-RU')}</Card.Text>
+                  <Card.Text><Badge bg="secondary">{r.threat_type?.name}</Badge></Card.Text>
+                  <Card.Footer></Card.Footer>
+                  <Button variant="outline-primary" className="small" onClick={() => navigate(`/request/${r.id}`)}>Просмотр</Button>
+                </Card.Body>
               </Card>
             ))
           )}

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Badge, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { fetchRequests } from '../api/api'
+import { requestsController } from '../api/http-controller'
 import { RequestItem } from '../types'
 
 export const EmployeeRequestsPage = () => {
@@ -11,8 +11,8 @@ export const EmployeeRequestsPage = () => {
 
   const { data: requests = [], isLoading } = useQuery<RequestItem[]>({
     queryKey: ['requests'],
-    queryFn: fetchRequests,
-    staleTime: 1000,
+    queryFn: () => requestsController.fetchRequests(),
+    staleTime: 120000,
   })
 
   const filteredRequests = useMemo(() => {
@@ -40,7 +40,7 @@ export const EmployeeRequestsPage = () => {
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
               <h2>Мои заявки</h2>
-              <p>Список заявок сотрудника доступен сразу после создания учетной записи.</p>
+              <p className="text-muted">Список заявок сотрудника доступен сразу после создания учетной записи.</p>
             </div>
             <Button variant="outline-secondary" onClick={() => navigate('/employee/create')}>
               Новая заявка
@@ -63,7 +63,7 @@ export const EmployeeRequestsPage = () => {
                   <Card className="h-100">
                     <Card.Body>
                       <Card.Title>{item.title}</Card.Title>
-                      <Card.Subtitle>
+                      <Card.Text>
                       <Badge 
                         bg={
                             item.status === 'draft' ? 'secondary' 
@@ -77,11 +77,10 @@ export const EmployeeRequestsPage = () => {
                               : 'Закрыта'
                               } 
                       </Badge>
-                      </Card.Subtitle>  
-                      <Card.Text className="text-muted">
-                        <p className="text-muted"><strong>Тип:</strong> {item.threat_type?.name || 'Не указано'}</p>
-                        <p className="text-muted"><strong>Дата:</strong> {item.created_at.slice(0, 10)}</p>
-                      </Card.Text>               
+                      </Card.Text>  
+                      <Card.Text className="text-muted"><strong>Тип:</strong> {item.threat_type?.name || 'Не указано'}</Card.Text>   
+                      <Card.Text className="text-muted"><strong>Дата:</strong> {item.created_at.slice(0, 10)}</Card.Text>
+                      <Card.Text className="text-muted"><strong>Описание:</strong> {item.description || 'Не указано'}</Card.Text>                  
                       <Button variant="outline-primary" onClick={() => navigate(`/request/${item.id}`)}>
                         Просмотр
                       </Button>
