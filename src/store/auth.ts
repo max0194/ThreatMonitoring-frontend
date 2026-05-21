@@ -29,14 +29,8 @@ export const login = createAsyncThunk(
     thunkAPI
   ) => {
     try {
-        const user = await authController.loginUser(data.email,
-        data.password)
-
-        localStorage.setItem(
-        'user',
-        JSON.stringify(user)
-        )
-
+        const user = await authController.loginUser(data.email,data.password)
+        localStorage.setItem('user', JSON.stringify(user))
         return user
     } catch (err) {
       return thunkAPI.rejectWithValue(

@@ -42,25 +42,6 @@ function AppRoutes({ user, backendAvailable }: { user: User | null; backendAvail
   )
 }
 
-const saveUserToStorage = (user: User) => {
-  localStorage.setItem('app_user', JSON.stringify(user));
-};
-
-const getUserFromStorage = (): User | null => {
-  const userJson = localStorage.getItem('app_user');
-  if (!userJson) return null;
-  try {
-    return JSON.parse(userJson);
-  } catch {
-    return null;
-  }
-};
-
-const clearUserFromStorage = () => {
-  localStorage.removeItem('app_user');
-};
-
-
 function AppContent() {
   const dispatch = useAppDispatch()
 

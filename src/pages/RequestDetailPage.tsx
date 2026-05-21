@@ -68,8 +68,7 @@ export const RequestDetailPage = ({ user }: Props) => {
           requests.filter(
             (r) =>
               r.id !== request.id &&
-              r.threat_type?.id ===
-                request.threat_type?.id,
+              r.threat_type?.id === request.threat_type?.id,
           )
 
         if (
@@ -80,26 +79,18 @@ export const RequestDetailPage = ({ user }: Props) => {
         }
 
         const currentEmbedding =
-          await getOrCreateEmbedding(
-            request,
-          )
+          await getOrCreateEmbedding(request)
 
         const scored =
           await Promise.all(
             candidateRequests.map(
               async (r) => {
                 const embedding =
-                  await getOrCreateEmbedding(
-                    r,
-                  )
-
+                  await getOrCreateEmbedding(r)
                 return {
                   ...r,
                   similarity:
-                    cosineSimilarity(
-                      currentEmbedding,
-                      embedding,
-                    ),
+                    cosineSimilarity(currentEmbedding, embedding),
                 }
               },
             ),
@@ -116,8 +107,7 @@ export const RequestDetailPage = ({ user }: Props) => {
           )
           .sort(
             (a, b) =>
-              b.similarity -
-              a.similarity,
+              b.similarity - a.similarity,
           )
           .slice(0, 5)
 
@@ -145,8 +135,7 @@ export const RequestDetailPage = ({ user }: Props) => {
 
   const canAddFact = user?.user_type === 'employee' && request?.status !== 'closed'
   const canTakeRequest = user?.user_type === 'specialist' && request?.status === 'awaiting'
-  const canCloseRequest =
-    user?.user_type === 'specialist' && request?.status === 'taken'
+  const canCloseRequest = user?.user_type === 'specialist' && request?.status === 'taken'
   const canDeleteRequest = user?.user_type === 'specialist' || user?.user_type === 'employee'
 
   const handleAddFact = async (event: FormEvent<HTMLFormElement>) => {
