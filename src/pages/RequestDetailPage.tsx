@@ -80,26 +80,19 @@ export const RequestDetailPage = ({ user }: Props) => {
         }
 
         const currentEmbedding =
-          await getOrCreateEmbedding(
-            request,
-          )
+          await getOrCreateEmbedding(request)
 
         const scored =
           await Promise.all(
             candidateRequests.map(
               async (r) => {
                 const embedding =
-                  await getOrCreateEmbedding(
-                    r,
-                  )
+                  await getOrCreateEmbedding(r)
 
                 return {
                   ...r,
                   similarity:
-                    cosineSimilarity(
-                      currentEmbedding,
-                      embedding,
-                    ),
+                    cosineSimilarity(currentEmbedding,embedding),
                 }
               },
             ),
@@ -111,13 +104,10 @@ export const RequestDetailPage = ({ user }: Props) => {
 
         const similar = scored
           .filter(
-            (x) =>
-              x.similarity > 0.3,
+            (x) => x.similarity > 0.3,
           )
           .sort(
-            (a, b) =>
-              b.similarity -
-              a.similarity,
+            (a, b) => b.similarity - a.similarity,
           )
           .slice(0, 5)
 
