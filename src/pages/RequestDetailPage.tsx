@@ -6,6 +6,7 @@ import { queryClient } from '../main'
 import { requestsController } from '../api/http-controller'
 import { RequestItem, RequestFact, User, SimilarRequest } from '../types'
 import { cosineSimilarity, getOrCreateEmbedding } from '../utils/embeddings'
+import { mockRequests, mockRequestsFacts } from '../mock/mockData'
 
 interface Props {
   user: User | null
@@ -32,7 +33,14 @@ export const RequestDetailPage = ({ user }: Props) => {
     isLoading: requestLoading,
     } = useQuery<RequestItem | null>({
       queryKey: ['request', requestId],
-      queryFn: () => requestsController.fetchRequestById(requestId),
+    queryFn: async (): Promise<RequestItem | null> => {
+      try {
+        return await requestsController.fetchRequestById(requestId);
+      } catch (error) {
+        console.error('Failed to fetch request, using mock data:', error);
+        return mockRequests[requestId-1] || null;
+      }
+    },
       enabled: requestId > 0,
       staleTime: 120000,
   })
@@ -42,14 +50,28 @@ export const RequestDetailPage = ({ user }: Props) => {
     isLoading: factsLoading,
     } = useQuery<RequestFact[]>({
       queryKey: ['requestfacts', requestId],
-      queryFn: () => requestsController.fetchRequestFacts(requestId),
+      queryFn: async (): Promise<RequestFact[]> => {
+        try {
+          return await requestsController.fetchRequestFacts(requestId);
+        } catch (error) {
+          console.error('Failed to fetch facts, using mock data:', error);
+          return mockRequestsFacts.filter((facts: any) => facts.request_id === requestId);
+        }
+      },
       enabled: requestId > 0,
       staleTime: 120000,
   })
 
   const { data: requests = [] } = useQuery({
     queryKey: ['requests'],
-    queryFn: () => requestsController.fetchRequests(),
+    queryFn: async (): Promise<any[]> => {
+      try {
+        return await requestsController.fetchRequests();
+      } catch (error) {
+        console.error('Failed to fetch requests, using mock data:', error);
+        return mockRequests;
+      }
+    },
     staleTime: 120000,
   })
 
@@ -406,7 +428,7 @@ export const RequestDetailPage = ({ user }: Props) => {
                   <p className="text-muted small mb-2">
                     Добавлено: {new Date(fact.created_at).toLocaleDateString('ru-RU')}
                   </p>
-                  <p className="mb-3">{fact.description}</p>
+                  <p className="text-muted mb-3">{fact.description}</p>
                   {fact.screenshot_url && (
                     <img
                       src={fact.screenshot_url}

@@ -37,9 +37,6 @@ export const Breadcrumbs: FC = () => {
     })
   return (
     <Nav>
-      <Nav.Link as={Link} to="/">
-        Главная
-      </Nav.Link>
       {crumbs.map((crumb, index) => (
         !crumb.label ? null : (
           <Nav.Item key={crumb.path || index} className="breadcrumb-item">

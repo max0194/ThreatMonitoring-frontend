@@ -40,7 +40,6 @@ export const EmployeeRequestsPage = () => {
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
               <h2>Мои заявки</h2>
-              <p className="text-muted">Список заявок сотрудника доступен сразу после создания учетной записи.</p>
             </div>
             <Button variant="outline-secondary" onClick={() => navigate('/employee/create')}>
               Новая заявка

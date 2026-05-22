@@ -1,9 +1,5 @@
 export const routeNames = [
   {
-    path: '/',
-    label: 'Главная',
-  },
-  {
     path: '/specialist',
     label: 'Список заявок',
   },
