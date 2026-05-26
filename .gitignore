@@ -1,2 +1,5 @@
-node_modules
-nginx
+node_modules/
+nginx/
+src-tauri/
+.husky/
+.env.dev
