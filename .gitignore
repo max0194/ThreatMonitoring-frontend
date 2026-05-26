@@ -1,2 +1,9 @@
 node_modules
 nginx
+.dockerignore
+Dockerfile
+.husky
+src-tauri
+.env.dev
+.env.tauri
+

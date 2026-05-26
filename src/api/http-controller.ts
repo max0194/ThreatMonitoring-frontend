@@ -1,22 +1,23 @@
-import { Api } from './api';
-import { HttpClient } from './http-client';
-import * as Types from '../types';
-import axios , { AxiosError }from 'axios'
+import { Api } from "./api";
+import { HttpClient } from "./http-client";
+import * as Types from "../types";
+import axios, { AxiosError } from "axios";
+import { API_URL } from "../config";
 
 const httpClient = new HttpClient({
-  baseURL: 'http://localhost:8080',
+  baseURL: `${API_URL}`,
 });
 
 const api = new Api(httpClient);
 
 interface ApiError {
-  status: string
-  message: string
+  status: string;
+  message: string;
 }
 
 export const authController = {
   async loginUser(email: string, password: string): Promise<Types.User> {
-    const data = { email, password};
+    const data = { email, password };
     try {
       const response = await api.authLoginCreate({
         body: data,
@@ -25,15 +26,12 @@ export const authController = {
       return res.user;
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 
   async logout(): Promise<void> {
@@ -41,21 +39,18 @@ export const authController = {
   },
 
   async registerUser(data: Types.RegisterRequest): Promise<void> {
-    try { 
+    try {
       await api.authRegisterCreate({
         body: data,
       } as any);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 };
 
@@ -71,33 +66,27 @@ export const requestsController = {
       return res.requests;
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 
   async createRequest(data: Types.UpdateRequestRequest): Promise<void> {
-    try {  
+    try {
       await api.requestsCreate({
         body: data,
       } as any);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 
   async fetchRequestById(id: number): Promise<Types.RequestItem> {
@@ -106,33 +95,30 @@ export const requestsController = {
       return (response.data as any).request;
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 
-  async updateRequest(id: number, data: Types.UpdateRequestRequest): Promise<void> {
+  async updateRequest(
+    id: number,
+    data: Types.UpdateRequestRequest,
+  ): Promise<void> {
     try {
       await api.requestsUpdate(id, {
         body: data,
       } as any);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 
   async submitRequest(id: number): Promise<void> {
@@ -140,15 +126,12 @@ export const requestsController = {
       await api.requestsSubmitUpdate(id);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 
   async deleteRequest(id: number): Promise<void> {
@@ -156,15 +139,12 @@ export const requestsController = {
       await api.requestsDelete(id);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 
   async completeRequest(id: number): Promise<void> {
@@ -172,15 +152,12 @@ export const requestsController = {
       await api.requestsCompleteUpdate(id);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 
   async fetchRequestFacts(id: number): Promise<Types.RequestFact[]> {
@@ -190,38 +167,37 @@ export const requestsController = {
       return res.facts;
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 
-  async createFact(id: number, title: string, description: string, file: File): Promise<void> {
+  async createFact(
+    id: number,
+    title: string,
+    description: string,
+    file: File,
+  ): Promise<void> {
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('screenshot', file);
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("screenshot", file);
 
     try {
       await api.requestsFactsCreate(id, {
         body: formData,
-        type: 'multipart/form-data',
+        type: "multipart/form-data",
       } as any);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-      const axiosError = err as AxiosError<ApiError>
+        const axiosError = err as AxiosError<ApiError>;
 
-      throw new Error(
-        axiosError.response?.data?.message ||
-        'Ошибка сервера'
-      )
+        throw new Error(axiosError.response?.data?.message || "Ошибка сервера");
+      }
+      throw err;
     }
-    throw err
-  }
   },
 };

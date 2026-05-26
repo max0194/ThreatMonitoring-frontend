@@ -1,12 +1,13 @@
-import { BrowserRouter } from 'react-router-dom'
-import { AppContent } from './content/AppContent'
+import { BrowserRouter } from "react-router-dom";
+import { AppContent } from "./content/AppContent";
+import { routerBasename } from "./env";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={routerBasename}>
       <AppContent />
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

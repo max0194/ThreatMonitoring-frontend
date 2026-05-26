@@ -11,6 +11,7 @@
  */
 
 import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { API_URL } from "../config";
 
 export class Api<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -25,11 +26,11 @@ export class Api<SecurityDataType = unknown> {
    * @tags auth
    * @name AuthLoginCreate
    * @summary Зайти за пользователя
-   * @request POST:/api/auth/login
+   * @request POST:${API_URL}/auth/login
    */
   authLoginCreate = (params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/auth/login`,
+      path: `${API_URL}/auth/login`,
       method: "POST",
       type: ContentType.Json,
       ...params,
@@ -40,12 +41,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags auth
    * @name AuthLogoutCreate
    * @summary Выход из системы
-   * @request POST:/api/auth/logout
+   * @request POST:${API_URL}/auth/logout
    * @secure
    */
   authLogoutCreate = (params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/auth/logout`,
+      path: `${API_URL}/auth/logout`,
       method: "POST",
       secure: true,
       type: ContentType.Json,
@@ -57,12 +58,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags auth
    * @name AuthRegisterCreate
    * @summary Зарегистрировать пользователя
-   * @request POST:/api/auth/register
+   * @request POST:${API_URL}/auth/register
    * @secure
    */
   authRegisterCreate = (params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/auth/register`,
+      path: `${API_URL}/auth/register`,
       method: "POST",
       secure: true,
       type: ContentType.Json,
@@ -74,7 +75,7 @@ export class Api<SecurityDataType = unknown> {
    * @tags requests
    * @name RequestsList
    * @summary Получить список заявок
-   * @request GET:/api/requests
+   * @request GET:${API_URL}/requests
    * @secure
    */
   requestsList = (
@@ -89,7 +90,7 @@ export class Api<SecurityDataType = unknown> {
     params: RequestParams = {},
   ) =>
     this.http.request<void, void>({
-      path: `/api/requests`,
+      path: `${API_URL}/requests`,
       method: "GET",
       query: query,
       secure: true,
@@ -102,12 +103,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags requests
    * @name RequestsCreate
    * @summary Создать заявку
-   * @request POST:/api/requests
+   * @request POST:${API_URL}/requests
    * @secure
    */
   requestsCreate = (params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/requests`,
+      path: `${API_URL}/requests`,
       method: "POST",
       secure: true,
       type: ContentType.Json,
@@ -119,12 +120,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags requests
    * @name RequestsDetail
    * @summary Получить заявку
-   * @request GET:/api/requests/{id}
+   * @request GET:${API_URL}/requests/{id}
    * @secure
    */
   requestsDetail = (id: any, params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/requests/${id}`,
+      path: `${API_URL}/requests/${id}`,
       method: "GET",
       secure: true,
       type: ContentType.Json,
@@ -136,12 +137,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags requests
    * @name RequestsUpdate
    * @summary Обновить заявку
-   * @request PUT:/api/requests/{id}
+   * @request PUT:${API_URL}/requests/{id}
    * @secure
    */
   requestsUpdate = (id: any, params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/requests/${id}`,
+      path: `${API_URL}/requests/${id}`,
       method: "PUT",
       secure: true,
       type: ContentType.Json,
@@ -153,12 +154,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags requests
    * @name RequestsDelete
    * @summary Удалить заявку
-   * @request DELETE:/api/requests/{id}
+   * @request DELETE:${API_URL}/requests/{id}
    * @secure
    */
   requestsDelete = (id: any, params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/requests/${id}`,
+      path: `${API_URL}/requests/${id}`,
       method: "DELETE",
       secure: true,
       type: ContentType.Json,
@@ -170,12 +171,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags requests
    * @name RequestsCompleteUpdate
    * @summary Завершить заявку
-   * @request PUT:/api/requests/{id}/complete
+   * @request PUT:${API_URL}/requests/{id}/complete
    * @secure
    */
   requestsCompleteUpdate = (id: any, params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/requests/${id}/complete`,
+      path: `${API_URL}/requests/${id}/complete`,
       method: "PUT",
       secure: true,
       type: ContentType.Json,
@@ -187,12 +188,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags requests
    * @name RequestsFactsList
    * @summary Получить факты заявки
-   * @request GET:/api/requests/{id}/facts
+   * @request GET:${API_URL}/requests/{id}/facts
    * @secure
    */
   requestsFactsList = (id: any, params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/requests/${id}/facts`,
+      path: `${API_URL}/requests/${id}/facts`,
       method: "GET",
       secure: true,
       type: ContentType.Json,
@@ -204,12 +205,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags requests
    * @name RequestsFactsCreate
    * @summary Добавить факт к заявке
-   * @request POST:/api/requests/{id}/facts
+   * @request POST:${API_URL}/requests/{id}/facts
    * @secure
    */
   requestsFactsCreate = (id: any, params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/requests/${id}/facts`,
+      path: `${API_URL}/requests/${id}/facts`,
       method: "POST",
       secure: true,
       type: ContentType.Json,
@@ -221,12 +222,12 @@ export class Api<SecurityDataType = unknown> {
    * @tags requests
    * @name RequestsSubmitUpdate
    * @summary Взять заявку в работу
-   * @request PUT:/api/requests/{id}/submit
+   * @request PUT:${API_URL}/requests/{id}/submit
    * @secure
    */
   requestsSubmitUpdate = (id: any, params: RequestParams = {}) =>
     this.http.request<void, void>({
-      path: `/api/requests/${id}/submit`,
+      path: `${API_URL}/requests/${id}/submit`,
       method: "PUT",
       secure: true,
       type: ContentType.Json,
