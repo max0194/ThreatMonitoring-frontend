@@ -4,6 +4,4 @@ nginx
 Dockerfile
 .husky
 src-tauri
-.env.dev
-.env.tauri
-
+dist/

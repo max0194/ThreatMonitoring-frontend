@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.2",
   "type": "module",
+  "homepage": "https://max0194.github.io/ThreatMonitoring-frontend/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -13,7 +14,7 @@
     "merge-openapi": "npx openapi-merge-cli --config ./src/swagger/openapi.config.json",
     "codegen:api": "node ./src/codegen/codegen.js",
     "codegen": "npm run merge-openapi && npm run codegen:api",
-    "deploy": "gh-pages -d dist",
+    "deploy": "gh-pages -d ./dist",
     "tauri": "tauri",
     "tauri:dev": "cross-env VITE_APP_MODE=tauri tauri dev",
     "tauri:build": "cross-env VITE_APP_MODE=tauri tauri build"
