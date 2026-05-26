@@ -26,7 +26,7 @@ export function AppContent() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        const response = await axios.get(`${API_URL}`, {
+        const response = await axios.get(`${API_URL}/`, {
           signal: controller.signal,
         });
 
