@@ -1,34 +1,33 @@
-import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { Container } from 'react-bootstrap'
-import { AppNavbar } from '../components/AppNavbar'
-import { AppRoutes } from '../routes/AppRoutes'
-import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { logout } from '../store/auth'
-import axios from "axios"
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Container } from "react-bootstrap";
+import { AppNavbar } from "../components/AppNavbar";
+import { AppRoutes } from "../routes/AppRoutes";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { logout } from "../store/auth";
+import { API_URL } from "../config";
+import axios from "axios";
 
 export function AppContent() {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  const user = useAppSelector(
-    (state) => state.auth.user
-  )
-  const navigate = useNavigate()
+  const user = useAppSelector((state) => state.auth.user);
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await dispatch(logout())
-    navigate('/login', { replace: true })
-  }
+    await dispatch(logout());
+    navigate("/login", { replace: true });
+  };
 
-  const [backendAvailable, setBackendAvailable] = useState(true)
+  const [backendAvailable, setBackendAvailable] = useState(true);
   useEffect(() => {
     const checkBackend = async () => {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        const response = await axios.get('http://localhost:8080', {
-          signal: controller.signal
+        const response = await axios.get(`${API_URL}/`, {
+          signal: controller.signal,
         });
 
         clearTimeout(timeoutId);
@@ -39,7 +38,7 @@ export function AppContent() {
           setBackendAvailable(false);
         }
       } catch (error) {
-        console.error('Ошибка проверки запуска сервиса:', error);
+        console.error("Ошибка проверки запуска сервиса:", error);
         setBackendAvailable(false);
       }
     };
@@ -54,5 +53,5 @@ export function AppContent() {
         <AppRoutes user={user} backendAvailable={backendAvailable} />
       </Container>
     </>
-  )
+  );
 }

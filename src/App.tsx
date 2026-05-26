@@ -1,12 +1,12 @@
-import { BrowserRouter } from 'react-router-dom'
-import { AppContent } from './content/AppContent'
+import { HashRouter } from "react-router-dom";
+import { AppContent } from "./content/AppContent";
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AppContent />
-    </BrowserRouter>
-  )
+    </HashRouter>
+  );
 }
 
-export default App
+export default App;
