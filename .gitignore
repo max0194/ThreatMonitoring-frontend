@@ -3,5 +3,5 @@ nginx
 .dockerignore
 Dockerfile
 .husky
-src-tauri
+src-tauri/
 dist/
