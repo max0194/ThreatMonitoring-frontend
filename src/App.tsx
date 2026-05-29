@@ -14,9 +14,10 @@ import { MockSpecialistPage } from './mock/SpecialistPage'
 import { MockRequestDetailPage } from './mock/RequestDetailPage'
 import { logoutUser, getCurrentUser } from './api/api'
 import { User } from './types'
+import { API_URL } from './config'
 import axios from "axios"
 
-function AppRoutes({ user, onLoginSuccess, backendAvailable }: { user: User | null; onLoginSuccess: (user: User) => void; backendAvailable: boolean }) {
+function AppRoutes({ user, onLoginSuccess, backendAvailable }: { user: User | null; onLoginSuccess: (user: User, token: string) => void; backendAvailable: boolean }) {
   if (!backendAvailable) {
     return (
       <Routes>
@@ -59,6 +60,17 @@ const clearUserFromStorage = () => {
   localStorage.removeItem('app_user');
 };
 
+const saveTokenToStorage = (token: string) => {
+  localStorage.setItem('access_token', token);
+};
+
+const getTokenFromStorage = (): string | null => {
+  return localStorage.getItem('access_token');
+};
+
+const clearTokenFromStorage = () => {
+  localStorage.removeItem('access_token');
+};
 
 function AppContent() {
   const [user, setUser] = useState<User | null>(getUserFromStorage());
@@ -87,7 +99,7 @@ function AppContent() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        const response = await axios.get('http://localhost:8080', {
+        const response = await axios.get(`${API_URL}/health`, {
           signal: controller.signal
         });
 
@@ -122,9 +134,11 @@ function AppContent() {
     navigate('/login', { replace: true });
   };
 
-  const handleLoginSuccess = (user: User) => {
+  const handleLoginSuccess = (user: User, token: string) => {
     setUser(user);
+
     saveUserToStorage(user);
+    saveTokenToStorage(token);
   };
 
   return (

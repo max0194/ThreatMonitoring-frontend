@@ -66,3 +66,8 @@ export interface SimilarRequest
   extends RequestItem {
   similarity?: number
 }
+
+export interface LoginResponse {
+  user: User;
+  token: string;
+}

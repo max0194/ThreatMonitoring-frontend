@@ -5,7 +5,7 @@ import { loginUser } from '../api/api'
 import { User, UserType } from '../types'
 
 interface Props {
-  onLoginSuccess: (user: User) => void
+  onLoginSuccess: (user: User, token: string) => void
 }
 
 export const LoginPage = ({ onLoginSuccess }: Props) => {
@@ -22,9 +22,9 @@ export const LoginPage = ({ onLoginSuccess }: Props) => {
     setLoading(true)
 
     try {
-      const user = await loginUser(email, password, userType)
-      onLoginSuccess(user)
-      navigate(`/${user.user_type}`, { replace: true })
+      const result = await loginUser(email, password, userType)
+      onLoginSuccess(result.user, result.token)
+      navigate(`/${result.user.user_type}`, { replace: true })
     } catch (err) {
       setError((err as Error).message)
     } finally {

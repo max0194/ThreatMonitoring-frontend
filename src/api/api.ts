@@ -1,29 +1,35 @@
-import { RequestItem, RequestFact, User, UserType } from '../types'
-import axios , { AxiosError }from 'axios'
+import { RequestItem, RequestFact, User, UserType, LoginResponse } from '../types'
+import axios , { AxiosError } from 'axios'
+import { API_URL } from '../config'
 
 interface ApiError {
   status: string
   message: string
 }
 
-export const loginUser = async (email: string, password: string, userType: UserType): Promise<User> => {
+export const api = axios.create({
+  baseURL: "http://127.0.0.1:8085/api",
+  withCredentials: true,
+});
+
+export const loginUser = async (email: string, password: string, userType: UserType): Promise<LoginResponse> => {
   try {
-    const response = await axios.post('/api/auth/login', {
+    const response = await api.post(`${API_URL}/auth/login`, {
       email,
       password,
       user_type: userType,
     },
-    {
-      withCredentials: true,
-    });
+  );
 
     const body = response.data;
-
     if (body.status !== 'ok') {
       throw new Error(body.message || 'Ошибка входа');
     }
-
-    return body.user as User;
+    localStorage.setItem('access_token', body.token);
+    return {
+      user: body.user as User,
+      token: body.token,
+    }
   } catch (err) {
     if (axios.isAxiosError(err)) {
       const axiosError = err as AxiosError<ApiError>
@@ -38,14 +44,12 @@ export const loginUser = async (email: string, password: string, userType: UserT
 }
 
 export const logoutUser = async (): Promise<void> => {
-  await axios.post('/api/auth/logout', {
-    withCredentials: true,
-  })
+  await api.post(`/auth/logout`, {})
 }
 
 export const getCurrentUser = async (): Promise<User | null> => {
   try {
-    const response = await axios.get('/api/auth/profile', {
+    const response = await api.get(`/auth/profile`, {
       withCredentials: true,
     })
     const body = response.data
@@ -68,9 +72,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
 
 export const fetchRequests = async (): Promise<RequestItem[]> => {
   try {
-    const response = await axios.get('/api/requests', {
-      withCredentials: true,
-    })
+    const response = await api.get(`/requests`, {})
     const body = response.data
     if (body.status !== 'ok') {
       throw new Error(body.message || 'Ошибка загрузки заявок')
@@ -91,13 +93,10 @@ export const fetchRequests = async (): Promise<RequestItem[]> => {
 
 export const createRequest = async (title: string, description: string, threatTypeId: number): Promise<void> => {
   try {
-    const response = await axios.post('/api/requests', {
+    const response = await api.post(`/requests`, {
       title, 
       description, 
       threat_type_id: threatTypeId,
-    },
-    {
-      withCredentials: true,
     });
     const body = response.data
     if (body.status !== 'ok') {
@@ -124,18 +123,14 @@ export const registerUser = async (
   userType: UserType,
 ): Promise<void> => {
   try {
-    const response = await axios.post('/api/auth/register',
+    const response = await api.post(`/auth/register`,
       {
         email,
         password,
         full_name: fullName,
         phone,
         user_type: userType,
-      },
-      {
-        withCredentials: true,
-      }
-    )
+      })
 
     const body = response.data
 
@@ -157,9 +152,7 @@ export const registerUser = async (
 
 export const fetchRequestById = async (id: number): Promise<RequestItem | null> => {
   try {
-    const response = await axios.get(`/api/requests/${id}`, {
-      withCredentials: true,
-    })
+    const response = await api.get(`/requests/${id}`, {})
     const body = response.data
     if (body.status !== 'ok') {
       return null
@@ -180,11 +173,8 @@ export const fetchRequestById = async (id: number): Promise<RequestItem | null> 
 
 export const updateRequestStatus = async (id: number, status: string): Promise<void> => {
   try {
-    const response = await axios.put(`/api/requests/${id}`, {
+    const response = await api.put(`/requests/${id}`, {
       status,
-    },
-    {
-      withCredentials: true,
     });
     const body = response.data
     if (body.status !== 'ok') {
@@ -205,9 +195,7 @@ export const updateRequestStatus = async (id: number, status: string): Promise<v
 
 export const submitRequest = async (id: number): Promise<void> => {
   try {
-    const response = await axios.put(`/api/requests/${id}/submit`, {
-      withCredentials: true
-    })
+    const response = await api.put(`/requests/${id}/submit`, {})
     const body = response.data
     if (body.status !== 'ok') {
       throw new Error(body?.message || 'Ошибка принятия заявки')
@@ -227,11 +215,8 @@ export const submitRequest = async (id: number): Promise<void> => {
 
 export const completeRequest = async (id: number, status: string): Promise<void> => {
   try {
-    const response = await axios.put(`/api/requests/${id}/complete`, {
+    const response = await api.put(`/requests/${id}/complete`, {
       status,
-    },
-    {
-      withCredentials: true,
     });
     const body = response.data
     if (body.status !== 'ok') {
@@ -252,12 +237,9 @@ export const completeRequest = async (id: number, status: string): Promise<void>
 
 export const updateRequestContent = async (id: number, title: string, description: string): Promise<void> => {
   try {
-    const response = await axios.put(`/api/requests/${id}`, {
+    const response = await api.put(`/requests/${id}`, {
       title, 
       description,
-    },
-    {
-      withCredentials: true,
     });
     const body = response.data
     if (body.status !== 'ok') {
@@ -278,9 +260,7 @@ export const updateRequestContent = async (id: number, title: string, descriptio
 
 export const deleteRequest = async (id: number): Promise<void> => {
   try {
-    const response = await axios.delete(`/api/requests/${id}`, {
-      withCredentials: true
-    })
+    const response = await api.delete(`/requests/${id}`, {})
     const body = response.data
     if (body.status !== 'ok') {
       throw new Error(body?.message || 'Ошибка удаления заявки')
@@ -300,9 +280,7 @@ export const deleteRequest = async (id: number): Promise<void> => {
 
 export const fetchRequestFacts = async (requestId: number): Promise<RequestFact[]> => {
   try {
-    const response = await axios.get(`/api/requests/${requestId}/facts`, {
-      withCredentials: true
-    })
+    const response = await api.get(`/requests/${requestId}/facts`, {})
     const body = response.data
     if (body.status !== 'ok') {
       throw new Error(body.message || 'Ошибка загрузки фактов')
@@ -333,11 +311,10 @@ export const createFact = async (
   formData.append('screenshot', file);
 
   try {
-    const response = await axios.post(
-      `/api/requests/${requestId}/facts`,
-      formData,
+    const response = await api.post(
+      `/requests/${requestId}/facts`,
+      {formData},
       {
-        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
