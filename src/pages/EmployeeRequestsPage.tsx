@@ -12,7 +12,7 @@ export const EmployeeRequestsPage = () => {
   const { data: requests = [], isLoading } = useQuery<RequestItem[]>({
     queryKey: ['requests'],
     queryFn: fetchRequests,
-    staleTime: 1000,
+    staleTime: 120000,
   })
 
   const filteredRequests = useMemo(() => {

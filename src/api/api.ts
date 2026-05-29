@@ -1,6 +1,5 @@
-import { RequestItem, RequestFact, User, UserType, LoginResponse } from '../types'
+import { RequestItem, RequestFact, User, UserType } from '../types'
 import axios , { AxiosError } from 'axios'
-import { API_URL } from '../config'
 
 interface ApiError {
   status: string
@@ -8,13 +7,13 @@ interface ApiError {
 }
 
 export const api = axios.create({
-  baseURL: "http://127.0.0.1:8085/api",
+  baseURL: "https://api.threatmonitoring.ru/api",
   withCredentials: true,
 });
 
-export const loginUser = async (email: string, password: string, userType: UserType): Promise<LoginResponse> => {
+export const loginUser = async (email: string, password: string, userType: UserType): Promise<User> => {
   try {
-    const response = await api.post(`${API_URL}/auth/login`, {
+    const response = await api.post(`/auth/login`, {
       email,
       password,
       user_type: userType,
@@ -25,11 +24,7 @@ export const loginUser = async (email: string, password: string, userType: UserT
     if (body.status !== 'ok') {
       throw new Error(body.message || 'Ошибка входа');
     }
-    localStorage.setItem('access_token', body.token);
-    return {
-      user: body.user as User,
-      token: body.token,
-    }
+    return body.user as User
   } catch (err) {
     if (axios.isAxiosError(err)) {
       const axiosError = err as AxiosError<ApiError>
@@ -313,7 +308,7 @@ export const createFact = async (
   try {
     const response = await api.post(
       `/requests/${requestId}/facts`,
-      {formData},
+      formData,
       {
         headers: {
           'Content-Type': 'multipart/form-data',
