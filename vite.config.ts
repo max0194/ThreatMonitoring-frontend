@@ -5,7 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 const isTauri = process.env.VITE_APP_MODE === 'tauri'
 
 export default defineConfig({
-  base: isTauri ? '/' : '/ThreatMonitoring-frontend/',
+  base: isTauri ? 'ThreatMonitoring-frontend/' : '/',
 
   plugins: [
     react(),
@@ -35,7 +35,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8085',
+        target: 'https://api.threatmonitoring.ru/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
