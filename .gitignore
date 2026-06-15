@@ -1,0 +1,3 @@
+compose/minio-data
+node_modules
+.husky

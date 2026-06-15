@@ -35,10 +35,10 @@
 1. Клонирование репозиториев:
 ```bash
 # Фронтенд
-git clone https://github.com/max0194/threat-monitoring-frontend.git
+git clone https://github.com/max0194/ThreatMonitoring-frontend.git
 
 # Бэкенд (требуется для работы)
-git clone https://github.com/max0194/threat-monitoring-backend.git
+git clone https://github.com/max0194/ThreatMonitoring-backend.git
 ```
 
 2. Запуск бэкенд-сервисов:
