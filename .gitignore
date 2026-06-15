@@ -1,7 +1,10 @@
 node_modules
-nginx
+nginx/
 .dockerignore
 Dockerfile
-.husky
+.husky/
 src-tauri/
-dist/
+.env.dev
+.env.tauri
+dist
+compose/minio-data
