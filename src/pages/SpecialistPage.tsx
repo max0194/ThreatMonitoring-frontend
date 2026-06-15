@@ -11,8 +11,10 @@ import { setQuery } from "../store/filters";
 export const SpecialistPage = () => {
   const navigate = useNavigate();
 
+  const user = useAppSelector((state) => state.auth.user);
+
   const { data: requests = [], isLoading } = useQuery({
-    queryKey: ["requests"],
+    queryKey: ["requests", user?.id],
     queryFn: async (): Promise<any[]> => {
       try {
         return await requestsController.fetchRequests();

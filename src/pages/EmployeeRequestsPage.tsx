@@ -10,10 +10,13 @@ import { setQuery } from "../store/filters";
 export const EmployeeRequestsPage = () => {
   const navigate = useNavigate();
 
+  const user = useAppSelector((state) => state.auth.user);
+
   const { data: requests = [], isLoading } = useQuery<RequestItem[]>({
-    queryKey: ["requests"],
+    queryKey: ["requests", user?.id],
     queryFn: () => requestsController.fetchRequests(),
     staleTime: 120000,
+    enabled: !!user,
   });
 
   const dispatch = useAppDispatch();

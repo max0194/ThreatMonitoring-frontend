@@ -76,9 +76,11 @@ export const requestsController = {
 
   async createRequest(data: Types.UpdateRequestRequest): Promise<void> {
     try {
-      await api.requestsCreate({
+      const response = await api.requestsCreate({
         body: data,
       } as any);
+
+      return response.data;
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<ApiError>;

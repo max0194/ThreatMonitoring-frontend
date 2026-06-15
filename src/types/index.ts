@@ -1,40 +1,41 @@
-export type UserType = 'employee' | 'specialist'
+export type UserType = "employee" | "specialist";
 
 export interface User {
-  id: number
-  email: string
-  full_name: string
-  user_type: UserType
+  id: number;
+  email: string;
+  full_name: string;
+  user_type: UserType;
 }
 
 export interface ThreatType {
-  id: number
-  name: string
-  category?: {
-    id: number
-    name: string
-  }
+  id: number;
+  name: string;
+  categoryId?: {
+    id: number;
+    name: string;
+  };
 }
 
 export interface RequestFact {
-  id: number
-  request_id: number
-  title: string
-  description: string
-  screenshot_url: string
-  created_at: string
+  id: number;
+  request_id: number;
+  title: string;
+  description: string;
+  screenshot_url: string;
+  created_at: string;
 }
 
 export interface RequestItem {
-  id: number
-  title: string
-  description: string
-  status: string
-  created_at: string
-  result_count: number
-  threat_type?: ThreatType
-  creator?: User
-  request_facts?: RequestFact[]
+  id: number;
+  title: string;
+  description: string;
+  status: string;
+  created_at: string;
+  result_count: number;
+  threat_type?: ThreatType;
+  creator?: User;
+  request_facts?: RequestFact[];
+  moderator?: User;
 }
 
 export interface LoginRequest {
@@ -78,7 +79,6 @@ export interface RequestsListResponse {
   requests: RequestItem[];
 }
 
-export interface SimilarRequest
-  extends RequestItem {
-  similarity?: number
+export interface SimilarRequest extends RequestItem {
+  similarity?: number;
 }

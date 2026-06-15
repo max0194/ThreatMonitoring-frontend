@@ -6,4 +6,5 @@ Dockerfile
 src-tauri/
 .env.dev
 .env.tauri
-dist/
+dist
+compose/minio-data
